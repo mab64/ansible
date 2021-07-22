@@ -1,0 +1,50 @@
+- name: httpd server(s) setup
+  become: yes
+  hosts: nodes
+  gather_facts: false
+  vars:
+    index_content: "<b>Welcome to my web server</b>"
+    index_location: "/var/www/html/index.html"
+
+  tasks:
+    - name: Install httpd
+      yum:
+        name: httpd
+        state: present
+      
+    - name: Autostart httpd
+      systemd: name=httpd enabled=yes state=started
+
+    - name: Checking firewall state
+      command: firewall-cmd --state
+      register: firewall_state
+      ignore_errors: yes
+      changed_when: false
+      failed_when: False
+#    - debug: msg='{{ firewall_state.stdout }}'
+
+    - name: Permitting http traffic
+      when: firewall_state.stdout == "running"
+      firewalld:
+        service: http
+        permanent: yes
+        immediate: yes
+        state: enabled
+
+    - name: Checking index.html content
+      shell: cat {{ index_location }} || echo ""
+      register: content
+      changed_when: "content.stdout != index_content"
+#    - debug: 
+#        msg: '{{ content.stdout }}'
+#    - debug:
+#        msg: '{{ content.changed }}'
+
+    - name: Creating index.html
+      when: content.changed
+      shell: 'echo "<b>Welcome to my web server</b>" > {{ index_location }}'
+
+#      file:
+#        path: "{{ index_location }}"
+#        state: file
+         
