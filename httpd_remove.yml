@@ -1,0 +1,23 @@
+- name: httpd server remove
+  become: yes
+  hosts: nodes
+  gather_facts: false
+  vars:
+    index_location: "/var/www/html/index.html"
+
+  tasks:
+    - name: Deinstall httpd
+      yum: name=httpd state=absent
+
+    - name: Delete index.html
+      file:
+        path: /var/www/html/index.html
+        state: absent
+      
+    - name: Disable http traffic
+      firewalld:
+        service: http
+        permanent: yes
+        immediate: yes
+        state: disabled
+
