@@ -1,0 +1,91 @@
+---
+- name: Grub config
+  become: yes
+  hosts: nodes
+  gather_facts: false
+  vars:
+#    grub_file: "/etc/default/grub"
+    grub_file: "/tmp/grub"
+
+  tasks:
+
+#    - name: net.ifnames
+#      lineinfile:
+#        path: "{{ grub_file }}"
+#        regexp: '^GRUB_CMDLINE_LINUX.*net\.ifnames=0'
+#        state: absent
+#      check_mode: yes
+#      changed_when: not param_present.found
+#      register: param_present
+#
+#    - debug: msg="{{ param_present.found}}"
+#
+#    - name: net.ifnames set value
+#      when: not param_present.found
+#      lineinfile:
+#        path: "{{ grub_file }}"
+#        regexp: '^(GRUB_CMDLINE_LINUX.*)net\.ifnames=.(.*)$'
+#        line: '\1net.ifnames=0\2'
+##        state: present
+#        backrefs: yes
+
+#===
+
+#    - name: Check 'biosdevname' presence
+#      lineinfile:
+#        path: "{{ grub_file }}"
+#        regexp: '^GRUB_CMDLINE_LINUX.*biosdevname='
+#        state: absent
+#      check_mode: yes
+#      register: biosdevname
+#      changed_when: not biosdevname.found
+#
+#    - debug:
+#         msg: "{{ biosdevname.found }}"
+#
+#    - name: Add 'biosdevname' parameter
+#      when: not biosdevname.found
+#      lineinfile:
+#        path: "{{ grub_file }}"
+#        regexp: '^(GRUB_CMDLINE_LINUX.*)"$'
+#        line: '\1 biosdevname=0"'
+##        state: present
+#        backrefs: yes
+#
+#    - name: Set 'biosdevname' value
+#      when: biosdevname.found
+#      lineinfile:
+#        path: "{{ grub_file }}"
+#        regexp: '^(GRUB_CMDLINE_LINUX=".*)biosdevname=[^0](.*)"$'
+#        line: '\1biosdevname=0\2'
+##        state: present
+#        backrefs: yes
+#      register: biosdevname
+
+    - name: Set 'biosdevname' value
+#      when: biosdevname.found
+      lineinfile:
+        path: "{{ grub_file }}"
+        regexp: '^(GRUB_CMDLINE_LINUX=".*)biosdevname=[^0](.*)"$'
+        line: '\1biosdevname=0\2'
+#        state: present
+        backrefs: yes
+      register: biosdevname
+#    - debug:
+#        msg: "{{ biosdevname }}"
+
+#    - name: Checking 'biosdevname' value correct
+#      when: biosdevname_present.found
+#      lineinfile:
+#        path: "{{ grub_file }}"
+#        regexp: '^(GRUB_CMDLINE_LINUX.*)biosdevname=0'
+#        state: absent
+#      check_mode: yes
+#      register: biosdevname_ok
+#      changed_when: not biosdevname_ok.found
+#
+#    - debug: msg="{{ biosdevname_ok.found }}"
+#      when: biosdevname_present.found
+
+#===
+
