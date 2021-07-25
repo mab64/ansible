@@ -33,9 +33,7 @@
         
 
   tasks:
-#    - debug: var=users
-
-    - name: Create users from dict
+    - name: Create users 
       user:
         name: "{{ item.user }}"
         home: "/home/{{ item.user }}"

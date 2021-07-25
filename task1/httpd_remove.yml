@@ -1,12 +1,10 @@
-- name: httpd server remove
+- name: Apache web server(s) uninstall
   become: yes
   hosts: nodes
   gather_facts: false
-  vars:
-    index_location: "/var/www/html/index.html"
 
   tasks:
-    - name: Deinstall httpd
+    - name: Uninstall httpd
       yum: name=httpd state=absent
 
     - name: Delete index.html
