@@ -1,0 +1,8 @@
+anonymous_enable: yes
+local_enable: yes
+write_enable: yes
+anon_upload_enable: yes
+pasv_min_port: 55100
+pasv_max_port: 55110
+ports: [21/tcp, "{{ pasv_min_port }}-{{ pasv_max_port }}/tcp"]
+

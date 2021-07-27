@@ -1,0 +1,42 @@
+- name: Install vsftpd
+  yum: name=vsftpd state=present
+
+- name: Configure autostart vsftpd
+  systemd: name=vsftpd enabled=yes state=started masked=no
+
+- name: Create vsftpd config
+  template:
+    src: vsftpd.conf.j2
+    dest: /etc/vsftpd/vsftpd.conf
+  register: ftp_config
+
+#- debug: var=ftp_config
+
+- name: Create a directory for uploads
+  file:
+    path: /var/ftp/pub/uploads
+    state: directory
+    mode: '0777'
+
+- name: Install python3-libsemanage package
+  yum: name=python3-libsemanage state=present
+
+- name: Set SElinux for Anonymous FTP upload
+  seboolean:
+#    name: ftpd_anon_write
+    name: ftpd_full_access
+    state: true
+    persistent: yes
+ 
+- name: Restart vsftpd
+  systemd: name=vsftpd state=restarted
+  when: ftp_config.changed
+
+- name: Open ftp ports
+  firewalld:
+    port: "{{ item }}"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  loop: "{{ ports }}"
+

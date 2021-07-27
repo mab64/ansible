@@ -1,0 +1,6 @@
+- name: Install firewall
+  yum: name=firewalld state=present
+  
+- name: Configure firewall autostart
+  systemd: name=firewalld enabled=yes state=started masked=no
+

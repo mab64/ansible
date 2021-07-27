@@ -1,0 +1,11 @@
+<h1>Welcome to my  web server</h1>
+<h2>Host: {{ ansible_facts.hostname }}</h2>
+{#
+Date: {{ ansible_facts.date_time.date }} {{ ansible_facts.date_time.hour }}:{{ ansible_facts.date_time.minute }}
+#}
+<p>
+OS: {{ ansible_facts.distribution }} {{ ansible_facts.distribution_version }}<br>
+Kernel: {{ ansible_facts.kernel }} {{ ansible_facts.kernel_version }}<br>
+Total memory: {{ ansible_facts.memory_mb.real.total }} MB
+</p>
+<p>Contact person: {{ contact_person }}</p>

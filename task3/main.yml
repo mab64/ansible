@@ -1,0 +1,14 @@
+- name: Using Roles to install web & ftp server
+  become: yes
+  hosts: nodes
+#  hosts: node1
+  gather_facts: yes
+  vars:
+    contact_person: aleksandr_mukhin@epam.com
+    
+
+  roles:
+    - role: common
+    - role: webserver
+    - role: ftpserver
+    
