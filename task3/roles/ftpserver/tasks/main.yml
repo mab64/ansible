@@ -8,9 +8,8 @@
   template:
     src: vsftpd.conf.j2
     dest: /etc/vsftpd/vsftpd.conf
-  register: ftp_config
-
-#- debug: var=ftp_config
+#  register: ftp_config
+  notify: Restart vsftpd
 
 - name: Create a directory for uploads
   file:
@@ -28,9 +27,9 @@
     state: true
     persistent: yes
  
-- name: Restart vsftpd
-  systemd: name=vsftpd state=restarted
-  when: ftp_config.changed
+#- name: Restart vsftpd
+#  systemd: name=vsftpd state=restarted
+#  when: ftp_config.changed
 
 - name: Open ftp ports
   firewalld:
