@@ -6,3 +6,8 @@
 # Task 2
 ```ansible-playbook users_add.yml --vault-password-file vault-pass```
 
+# Task 3
+```ansible-playbook main.yml```
+
+# task 4
+See screenshots.
