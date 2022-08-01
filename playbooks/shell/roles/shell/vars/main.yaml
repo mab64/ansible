@@ -1,0 +1,6 @@
+bashrc_file: "~/.bashrc"
+inputrc_file: "~/.inputrc"
+vimrc_file: "~/.vimrc"
+vim_dir: "~/.vim"
+vimundo_dir: "~/.vim/undo"
+vimswap_dir: "~/.vim/swap"

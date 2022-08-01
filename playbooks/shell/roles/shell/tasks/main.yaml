@@ -1,0 +1,3 @@
+- include: bashrc.yaml
+- include: inputrc.yaml
+- include: vimrc.yaml

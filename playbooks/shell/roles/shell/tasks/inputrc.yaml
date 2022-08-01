@@ -1,0 +1,97 @@
+# .inputrc
+
+# - name: Create .inputrc if not exists
+#   ansible.builtin.file:
+#     path: "{{ inputrc_file }}"
+#     state: touch
+#     # mode: u+rw,g-wx,o-rwx
+#     modification_time: preserve
+#     access_time: preserve
+
+# - name: Add a line to a file if the file does not exist, without passing regexp
+- name: Home key
+  ansible.builtin.lineinfile:
+    path: "{{ inputrc_file }}"
+    line: '"\e[1~": beginning-of-line'
+    create: yes
+
+- name: End key
+  ansible.builtin.lineinfile:
+    path: "{{ inputrc_file }}"
+    # regexp: 
+    line: '"\e[4~": end-of-line'
+    insertafter: ': beginning-of-line'
+    # create: yes
+
+- name: history-search by Up arrow
+  ansible.builtin.lineinfile:
+    path: "{{ inputrc_file }}"
+    line: '"\e[A": history-search-backward'
+    # create: yes
+
+- name: history-search by Down arrow
+  ansible.builtin.lineinfile:
+    path: "{{ inputrc_file }}"
+    line: '"\e[B": history-search-forward'
+    insertafter: ': history-search-backward'
+    
+- name: Setting .inputrc show-all-if-ambiguous
+  lineinfile:
+    path: "{{ inputrc_file }}"
+    regexp: '^set show-all-if-ambiguous'
+    line: 'set show-all-if-ambiguous on'
+    # backrefs: yes
+
+- name: Setting .inputrc completion-ignore-case
+  lineinfile:
+    path: "{{ inputrc_file }}"
+    regexp: '^set completion-ignore-case'
+    line: 'set completion-ignore-case on'
+    # backrefs: yes
+
+- name: mappings for Ctrl-left-arrow and Ctrl-right-arrow for word moving
+  ansible.builtin.blockinfile:
+    path: "{{ inputrc_file }}"
+    block: |
+      # mappings for Ctrl-left-arrow and Ctrl-right-arrow for word moving
+      "\e[1;5C": forward-word
+      "\e[1;5D": backward-word
+      "\e[5C": forward-word
+      "\e[5D": backward-word
+      "\e\e[C": forward-word
+      "\e\e[D": backward-word
+
+
+# - name: mappings for Ctrl-left-arrow and Ctrl-right-arrow for word moving
+#   ansible.builtin.lineinfile:
+#     path: "{{ inputrc_file }}"
+#     line: '# mappings for Ctrl-left-arrow and Ctrl-right-arrow for word moving'
+# - name: forward-word 1
+#   ansible.builtin.lineinfile:
+#     path: "{{ inputrc_file }}"
+#     line: '"\e[1;5C": forward-word'
+#     insertafter: '# mappings for Ctrl-left-arrow and Ctrl-right-arrow for word moving'
+# - name: backward-word 1
+#   ansible.builtin.lineinfile:
+#     path: "{{ inputrc_file }}"
+#     line: '"\e[1;5D": backward-word'
+#     insertafter: '^"\\e\[1;5C": '
+# - name: forward-word 2
+#   ansible.builtin.lineinfile:
+#     path: "{{ inputrc_file }}"
+#     line: '"\e[5C": forward-word'
+# - name: backward-word 2
+#   ansible.builtin.lineinfile:
+#     path: "{{ inputrc_file }}"
+#     line: '"\e[5D": backward-word'
+#     insertafter: '^"\\e\[5C": '
+# - name: forward-word 3
+#   ansible.builtin.lineinfile:
+#     path: "{{ inputrc_file }}"
+#     line: '"\e\e[C": forward-word'
+# - name: backward-word 3
+#   ansible.builtin.lineinfile:
+#     path: "{{ inputrc_file }}"
+#     line: '"\e\e[D": forward-word'
+#     insertafter: '^"\\e\e\[C": '
+  

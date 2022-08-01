@@ -1,0 +1,51 @@
+# .bashrc
+- name: Setting HISTCONTROL
+  lineinfile:
+    path: "{{ bashrc_file }}"
+    regexp: '^HISTCONTROL='
+    line: 'HISTCONTROL=ignoreboth:erasedups'
+
+- name: Setting HISTIGNORE
+  lineinfile:
+    path: "{{ bashrc_file }}"
+    regexp: '^HHISTIGNORE='
+    line: 'HISTIGNORE="?:??:$HISTIGNORE"'
+
+- name: Setting HISTSIZE
+  lineinfile:
+    path: "{{ bashrc_file }}"
+    regexp: '^HISTSIZE='
+    line: 'HISTSIZE=5000'
+
+- name: Setting HISTFILESIZE
+  lineinfile:
+    path: "{{ bashrc_file }}"
+    regexp: '^HISTFILESIZE='
+    line: 'HISTFILESIZE=5000'
+
+- name: Setting PS1
+  lineinfile:
+    path: "{{ bashrc_file }}"
+    regexp: '^PS1='
+    line: 'PS1="\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\W\[\033[00m\]\$ "'
+
+- name: Set alias ll
+  lineinfile:
+    path: "{{ bashrc_file }}"
+    regexp: '^#(alias ll=.*)$'
+    line: '\1'
+    backrefs: yes
+
+- name: Set alias la
+  lineinfile:
+    path: "{{ bashrc_file }}"
+    regexp: '^#(alias la=.*)$'
+    line: '\1'
+    backrefs: yes
+
+- name: Set alias la
+  lineinfile:
+    path: "{{ bashrc_file }}"
+    regexp: '^#(alias l=.*)$'
+    line: '\1'
+    backrefs: yes

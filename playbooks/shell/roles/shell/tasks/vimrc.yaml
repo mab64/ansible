@@ -1,0 +1,18 @@
+- name: Create vim undo dir if not exists
+  ansible.builtin.file:
+    path: "{{ vimundo_dir }}"
+    state: directory
+    mode: 0700
+
+- name: Create vim swap dir if not exists
+  ansible.builtin.file:
+    path: "{{ vimswap_dir }}"
+    state: directory
+    mode: 0700
+
+- name: Copy .vimrc file
+  ansible.builtin.copy:
+    src: ".vimrc"
+    dest: "~/"
+    mode: 0640
+

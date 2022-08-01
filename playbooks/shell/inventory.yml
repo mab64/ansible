@@ -1,0 +1,8 @@
+---
+nodes:
+  hosts:
+    node1:
+    node2:
+  vars:
+    ansible_user: 'al.b.mukhin'
+
