@@ -1,0 +1,7 @@
+- name: Add webtutor user
+  user:
+    name: webtutor
+    system: yes
+    shell: /usr/bin/false
+    create_home: false
+    state: absent
