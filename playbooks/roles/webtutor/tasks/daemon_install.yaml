@@ -1,0 +1,17 @@
+- name: Installing systemd startup script
+  ansible.builtin.template:
+    src: "wt-ldap-auth.service.j2"
+    dest: "/etc/systemd/system/"
+    # state: "{{ state }}"
+
+  # ansible.builtin.copy:
+  #   src: "wt-ldap-auth.service"
+  #   dest: "/etc/systemd/system/"
+  #   mode: 0644
+
+- name: Configuring daemon
+  ansible.builtin.systemd:
+    name: wt-ldap-auth
+    daemon_reload: yes
+    enabled: yes
+    state: started

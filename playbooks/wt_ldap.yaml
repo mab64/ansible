@@ -1,0 +1,16 @@
+---
+- name: Temporary
+  hosts: all
+  gather_facts: false
+  #  become: no
+  # become_user: user
+  # vars:
+  #   bashrc_file: "~/.bashrc"
+  #   inputrc_file: "~/.inputrc"
+
+  roles:
+    - role: webtutor
+
+  # tasks:
+  #   - include_tasks: ./roles/webtutor/tasks/useradd.yaml
+

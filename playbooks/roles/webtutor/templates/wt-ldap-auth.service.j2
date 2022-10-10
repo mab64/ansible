@@ -1,0 +1,20 @@
+[Unit]
+Description=Webtutor LDAP Authentication daemon
+After=network.target
+
+[Service]
+User={{ wt_ldap_user }}
+Group={{ wt_ldap_user }}
+UMask=0002
+WorkingDirectory=/opt/ldap_auth_service
+#ExecStartPre=export $(cat .env | xargs)
+EnvironmentFile=/opt/ldap_auth_service/.env
+ExecStart=/opt/ldap_auth_service/.venv/bin/python main.py
+KillMode=mixed
+TimeoutStopSec=5
+PrivateTmp=true
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+

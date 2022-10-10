@@ -1,0 +1,14 @@
+# Installing app 
+- name: Creating app folder
+  ansible.builtin.file:
+    path: "{{ app_path }}"
+    state: directory
+    mode: 0755
+    owner: "{{ app_user }}"
+    group : "{{ app_user }}"
+
+- name: Untar app
+  unarchive:
+    src: ./.files/ldap_auth_service.tgz
+    dest: /opt  #"{{ app_path }}"
+    owner: "{{ app_user }}"

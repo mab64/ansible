@@ -1,7 +1,8 @@
-- name: Add webtutor user
-  user:
-    name: webtutor
+- name: Creating user
+  ansible.builtin.user:
+    name: "{{ app_user }}"
     system: yes
     shell: /usr/bin/false
     create_home: false
-    state: absent
+    state: present
+

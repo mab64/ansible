@@ -1,0 +1,3 @@
+app_user: wt_ldap
+app_path: "/opt/ldap_auth_service"
+#state: present
