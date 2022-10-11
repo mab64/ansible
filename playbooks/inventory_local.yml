@@ -2,3 +2,5 @@
 nodes:
   hosts:
     localhost:
+vars:
+  ansible_become_password: '{{ become_pass }}'

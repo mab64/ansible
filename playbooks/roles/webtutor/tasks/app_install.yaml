@@ -3,7 +3,7 @@
   ansible.builtin.file:
     path: "{{ app_path }}"
     state: directory
-    mode: 0755
+    mode: "02775"
     owner: "{{ app_user }}"
     group : "{{ app_user }}"
 
@@ -12,3 +12,4 @@
     src: ./.files/ldap_auth_service.tgz
     dest: /opt  #"{{ app_path }}"
     owner: "{{ app_user }}"
+    group : "{{ app_user }}"

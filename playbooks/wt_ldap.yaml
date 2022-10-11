@@ -2,11 +2,12 @@
 - name: Temporary
   hosts: all
   gather_facts: false
-  #  become: no
+  # become: no
   # become_user: user
   # vars:
   #   bashrc_file: "~/.bashrc"
   #   inputrc_file: "~/.inputrc"
+  vars_files: .become-pass
 
   roles:
     - role: webtutor

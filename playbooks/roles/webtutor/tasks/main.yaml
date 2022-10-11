@@ -1,2 +1,3 @@
 - include: useradd.yaml
 - include: app_install.yaml
+- include: daemon_install.yaml
