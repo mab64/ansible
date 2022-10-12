@@ -7,7 +7,7 @@
   # vars:
   #   bashrc_file: "~/.bashrc"
   #   inputrc_file: "~/.inputrc"
-  vars_files: .become-pass
+  # vars_files: .become-pass
 
   roles:
     - role: webtutor

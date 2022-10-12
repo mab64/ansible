@@ -8,7 +8,7 @@
 - name: Setting HISTIGNORE
   lineinfile:
     path: "{{ bashrc_file }}"
-    regexp: '^HHISTIGNORE='
+    regexp: '^HISTIGNORE='
     line: 'HISTIGNORE="?:??:$HISTIGNORE"'
 
 - name: Setting HISTSIZE
@@ -43,7 +43,7 @@
     line: '\1'
     backrefs: yes
 
-- name: Set alias la
+- name: Set alias l
   lineinfile:
     path: "{{ bashrc_file }}"
     regexp: '^# *(alias l=.*)$'

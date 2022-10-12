@@ -1,4 +1,5 @@
 app_user: wt_ldap
-app_path: "/opt/ldap_auth_service"
+app_name: ldap_auth_service
+app_path: "/opt/{{ app_name }}"
 service_name: "wt-ldap-auth.service"
 #state: present

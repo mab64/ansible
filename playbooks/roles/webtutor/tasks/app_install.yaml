@@ -7,7 +7,7 @@
     owner: "{{ app_user }}"
     group : "{{ app_user }}"
 
-- name: Untar app
+- name: Installing (untar) app
   unarchive:
     src: ./.files/ldap_auth_service.tgz
     dest: /opt  #"{{ app_path }}"

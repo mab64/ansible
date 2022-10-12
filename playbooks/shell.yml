@@ -1,6 +1,6 @@
 ---
 - name: Shell tune up
-  hosts: nodes
+  hosts: all
   gather_facts: false
   become: no
   # become_user: user

@@ -1,6 +1,6 @@
 ---
-nodes:
+all:
   hosts:
     localhost:
-vars:
-  ansible_become_password: '{{ become_pass }}'
+  vars:
+    ansible_become_pass: '{{ become_pass }}'
