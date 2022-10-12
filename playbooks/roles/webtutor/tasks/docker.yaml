@@ -1,0 +1,10 @@
+- name: Install Docker
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - containerd
+    - docker.io
+
+- name: Docker autostart
+  service: name=docker enabled=yes state=started masked=no

@@ -1,0 +1,15 @@
+- name: Install common software
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - net-tools
+    - dnsutils
+    - nfs-common
+    - postgresql-client
+    - curl
+    - wget
+    - tcpdump
+#    - nmap
+    - dialog
+    - sshfs
