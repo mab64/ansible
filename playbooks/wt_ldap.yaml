@@ -1,16 +1,10 @@
 ---
-- name: Temporary
+- name: Install Webtutor LDAP Auth Service
   hosts: wt_ldap
   gather_facts: false
-  # become: no
-  # become_user: user
-  # vars:
-  #   bashrc_file: "~/.bashrc"
-  #   inputrc_file: "~/.inputrc"
-  # vars_files: .become-pass
 
   roles:
-    - role: webtutor
+    - role: wt_ldap
 
   # tasks:
   #   - include_tasks: ./roles/webtutor/tasks/useradd.yaml
