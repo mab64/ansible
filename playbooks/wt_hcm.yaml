@@ -1,0 +1,11 @@
+---
+- name: Install Webtutor
+  hosts: wt
+  gather_facts: false
+
+  roles:
+    - role: wt_hcm
+
+  # tasks:
+  #   - include_tasks: ./roles/webtutor/tasks/useradd.yaml
+
