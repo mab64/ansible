@@ -1,0 +1,31 @@
+---
+all:
+  # hosts:
+  #   # localhost
+  #   192.168.100.175:
+  #   192.168.100.94:
+  #   192.168.100.185:
+  #   192.168.100.213:
+  children:
+    db:
+      hosts:
+        192.168.100.175:
+    wt:
+      children:
+        wt_worker:
+          hosts:
+            192.168.100.94:
+        wt_web:
+          hosts:
+            192.168.100.185:
+            192.168.100.213:
+    # wt:
+    #   children:
+    #     wt_worker:
+    #     wt_web:
+    wt_ldap:
+      hosts:
+        192.168.100.175:
+  vars:
+    ansible_user: 'al.b.mukhin'
+

@@ -1,6 +1,10 @@
 ---
 all:
-  hosts:
+  hosts: 
     localhost:
+  children:
+    wt_ldap:
+      hosts:
+        localhost:
   vars:
     ansible_become_pass: '{{ become_pass }}'

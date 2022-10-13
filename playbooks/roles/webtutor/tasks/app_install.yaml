@@ -1,4 +1,4 @@
-# Installing app 
+# Installing ldap_auth_service app 
 - name: Creating app folder
   ansible.builtin.file:
     path: "{{ app_path }}"

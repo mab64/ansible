@@ -1,6 +1,6 @@
 ---
 - name: Temporary
-  hosts: all
+  hosts: wt_ldap
   gather_facts: false
   # become: no
   # become_user: user
