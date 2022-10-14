@@ -6,5 +6,8 @@ all:
     wt_ldap:
       hosts:
         localhost:
+    wt:
+      hosts:
+        localhost:
   vars:
     ansible_become_pass: '{{ become_pass }}'

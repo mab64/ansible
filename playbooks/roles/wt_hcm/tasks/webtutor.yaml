@@ -1,0 +1,57 @@
+---
+# - name: Upack image tar
+#   unarchive:
+#     src: /mnt/parent/D/Soft/hcm_2022.1.3.441.tar.gz
+#     dest: /tmp
+
+- name: Inspect image
+  community.docker.docker_image_info:
+    name: "websoft/hcm:2022.1.3.441"
+  register: result
+
+- debug:
+    msg: "Result: {{ result }}"
+
+# - name: Checking image exists locally
+#   ansible.builtin.assert:
+#     that:
+#       - result.images | length == 1
+
+
+- name: Checking if image tar {{ img_dst_dir }}/{{ img_name }}.tar exists
+  stat:
+    path: "{{ img_dst_dir }}/{{ img_name }}.tar"
+  register: result
+  when: "{{ result.images }} | length == 0"
+
+- debug:
+    msg: "File {{ img_dst_dir }}/{{ img_name }}.tar exists: {{ result.stat.exists }}"
+  when: "{{ result.images }} | length == 0"
+
+
+- name: Copy image archive
+  ansible.builtin.copy:
+    src: "{{ img_src_dir }}/{{ img_name }}.tar.gz"
+    dest: /tmp
+    force: no
+  when: "not {{ result.stat.exists }}"
+
+- name: Unarchive image tar
+  ansible.builtin.shell:
+    cmd: "gunzip -d {{ img_dst_dir }}/{{ img_name }}.tar.gz"
+    register: result
+    when: "not {{ result.stat.exists }}"
+
+- debug:
+    msg: "Result: {{ result.rc }}"
+
+
+# - name: Load image from tar file
+#   community.docker.docker_image_load:
+#     path: "{{ img_dst_dir }}/{{ img_name }}.tar"
+#   register: result
+
+# - name: Print the loaded image(s)
+#   ansible.builtin.debug:
+#     msg: "Loaded images: {{ result.image_names }}"  #  | join(', ')
+
