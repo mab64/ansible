@@ -1,13 +1,17 @@
 ---
+# ansible-playbook -i inventory/localhost.yml <play.yaml> --vault-password-file .vault-pass -e@.become-pass
 all:
   hosts: 
     localhost:
+      ansible_connection: local
   children:
     wt_ldap:
       hosts:
         localhost:
+          ansible_connection: local
     wt:
       hosts:
         localhost:
+          ansible_connection: local
   vars:
     ansible_become_pass: '{{ become_pass }}'
