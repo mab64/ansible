@@ -1,0 +1,51 @@
+---
+- name: Installing NGINX repo
+  yum:
+    name: https://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
+    state: present 
+
+- name: Removing previous nginx version
+  yum:
+    name: nginx
+    state: absent
+
+- name: Installing NGINX {{ nginx_version }} server
+  yum:
+    name: nginx-{{ nginx_version }}
+    state: present
+
+- name: Configuring NGINX server
+  copy:
+    src: files/nginx_default.conf
+    dest: /etc/nginx/conf.d/default.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Starting nginx
+  systemd: name=nginx enabled=yes state=restarted
+- name: Creating default site
+  shell: |
+    mkdir -p /var/www/html;
+    echo '<h1>Hello!</h1>' > /var/www/html/index.html;
+    echo '<?php phpinfo(); ?>' > /var/www/html/index.php;
+- name: Adding selinux rule for site's dir
+  shell: |
+    semanage fcontext -a -t httpd_sys_content_t "/var/www(/.*)?"
+    restorecon -r /var/www
+
+- name: Checking firewall state
+  shell: firewall-cmd --state
+  register: firewall_state
+  ignore_errors: yes
+  failed_when: False
+- debug: msg='{{ firewall_state.stdout }}'
+
+- name: Permitting traffic for http service
+  when: firewall_state.stdout == "running"
+  firewalld:
+    service: http
+    permanent: yes
+    immediate: yes
+    state: enabled
+

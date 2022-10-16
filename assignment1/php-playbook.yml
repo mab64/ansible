@@ -1,0 +1,12 @@
+---
+- name: PHP setup
+  become: yes
+  hosts: centos
+  gather_facts: false
+  vars_files:
+    - vars.default.yml
+    - vars.yml
+
+  tasks:
+    - import_tasks: php-tasks.yml
+

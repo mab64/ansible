@@ -1,0 +1,12 @@
+- name: Removing previous redis version
+  yum:
+    name: redis
+    state: absent
+- name: Installing redis {{ redis_version }}
+  yum:
+    name: redis-{{ redis_version }}
+    enablerepo: remi
+    state: present
+- name: Enable & run Redis
+  systemd: name=redis enabled=yes state=started
+

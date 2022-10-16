@@ -1,0 +1,50 @@
+- name: Installing MySQL repository
+  yum:
+    name: https://repo.mysql.com/mysql80-community-release-el7.rpm
+    state: present
+- name: Removing previous MySQL version
+  yum:
+    name: mysql-community*
+    state: absent
+- name: Removing MySQL data, conf & log
+  shell: |
+    rm -rf /var/lib/mysql/*
+    rm -f /var/log/mysqld.log
+    rm -f /etc/my.cnf
+    rm -rf /etc/my.cnf.d
+  ignore_errors: yes
+- name: Installing MySQL {{ mysql_version }}
+  yum:
+    name: 
+      - mysql-community-server
+      #- mysql-community-libs-compat
+      #- mysql-community-devel
+      #- python-devel
+      #- gcc
+    disablerepo: mysql*
+    enablerepo: mysql{{ mysql_version }}-community
+    state: present
+- name: Enable & run MySQL server
+  systemd: name=mysqld enabled=yes state=started
+
+- name: Getting MySQL temporary password
+  shell: grep 'temporary password' /var/log/mysqld.log | tail -1 | awk '{print $NF}'
+  register: mysql_tmp_password
+- debug: msg='{{ mysql_tmp_password.stdout }}'
+
+- name: Setting MySQL root password
+  shell: mysqladmin -u root --password="{{ mysql_tmp_password.stdout }}" password "{{ mysql_root_password }}"
+
+- name: Getting firewall state
+  shell: firewall-cmd --state
+  register: firewall_state
+  ignore_errors: yes
+  failed_when: False
+- debug: msg='{{ firewall_state.stdout }}'
+- name: Permitting traffic for MySQL service
+  when: firewall_state.stdout == "running"
+  firewalld:
+    service: mysql
+    permanent: yes
+    immediate: yes
+    state: enabled

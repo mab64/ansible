@@ -1,0 +1,19 @@
+- name: Installing ntp package for time synchronization
+  yum: name=ntp state=present
+- name: enable and start ntpd service
+  systemd: name=ntpd enabled=yes state=started
+#- name: upgrade all packages
+#  yum: 
+#    name=* 
+#    state=latest
+- name: Installing repositories
+  yum:
+    name:
+      - epel-release
+      - https://rpms.remirepo.net/enterprise/remi-release-7.rpm
+    state: present
+- name: Installing additional packages
+  yum:
+    name: '{{ common_pkgs }}'
+    state: present
+    #update_cache: yes

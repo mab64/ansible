@@ -1,0 +1,34 @@
+---
+- name: CentOS server(s) setup
+  become: yes
+  hosts: centos
+  gather_facts: false
+  vars_files:
+    - vars.default.yml
+    - vars.yml
+
+  tasks:
+    - name: Common tasks
+      include_tasks: common-tasks.yml
+      when: common_install == 1
+
+    - name: NGINX server setup  
+      include_tasks: nginx-tasks.yml
+      when: nginx_install == 1
+
+    - name: PHP setup
+      include_tasks: php-tasks.yml
+      when: php_install == 1
+
+    - name: Redis server setup
+      include_tasks: redis-tasks.yml
+      when: redis_install == 1
+
+    - name: MySQL server setup
+      include_tasks: mysql-tasks.yml
+      when: mysql_install == 1
+
+- name: MySQL replication setup
+  import_playbook: mysql-repl-playbook.yml
+  when: mysql_replication == 1 and mysql_install == 1
+

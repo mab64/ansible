@@ -1,0 +1,11 @@
+.*
+!.gitignore
+*.retry
+*.swp
+*.bak
+*~
+vars.yml
+hosts.cfg
+hosts.yml
+Vagrantfile
+

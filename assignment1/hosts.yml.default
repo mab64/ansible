@@ -1,0 +1,28 @@
+---
+centos:
+  hosts:
+    192.168.88.124:
+    192.168.88.125:
+  vars:
+    ansible_user: 'ansible'
+
+mysql-master:
+  hosts:
+    192.168.88.125:
+      server_id: 1
+
+mysql-slave:
+  hosts:
+    192.168.88.124:
+      server_id: 2
+
+ 
+#[centos]
+#192.168.43.231	ansible_connection=ssh	ansible_user=ansible
+#192.168.43.28	ansible_connection=ssh	ansible_user=ansible
+#
+#[mysql-master]
+#192.168.43.231	ansible_connection=ssh	ansible_user=ansible
+#
+#[mysql-slave]
+#192.168.43.28	ansible_connection=ssh	ansible_user=ansible

@@ -1,0 +1,18 @@
+---
+- name: Removing previous php version(s)
+  when: php_install == 1
+  yum:
+    name: php*
+    state: absent
+
+- name: Installing php{{ php_version }}
+  when: php_install == 1
+  yum:
+    name: "{{ php_modules }}"
+    disablerepo: remi*
+    enablerepo: "remi-php{{ php_version }}"
+    state: present
+- name: Running php-fpm
+  when: php_install == 1
+  systemd: name=php-fpm enabled=yes state=started
+

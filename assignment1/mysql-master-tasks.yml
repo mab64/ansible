@@ -1,0 +1,30 @@
+- lineinfile:
+    path: /etc/my.cnf
+    regexp: '^\s*server-id\s*='
+    line: 'server-id = {{ server_id }}'
+- lineinfile:
+    path: /etc/my.cnf
+    regexp: '^\s*log_bin\s*='
+    line: 'log_bin = mysql-bin'
+- name: Restarting mysqld
+  systemd: name=mysqld state=restarted
+
+- name: Getting master status
+  shell:
+    mysql -uroot -p"{{ mysql_root_password }}" -e "SHOW MASTER STATUS\G;"
+  register: master_status
+#- debug: msg='{{master_status.stdout}}'
+- name: Getting bin-log name
+  set_fact: 
+    bin_log_name: "{{ master_status.stdout | regex_search('File: (.+\\.\\d+)', '\\1') }}"
+    position: "{{ master_status.stdout | regex_search('Position: (\\d+)', '\\1') }}"
+
+- name: Creating replication user
+  shell: 
+    mysql -uroot -p"{{ mysql_root_password }}" -e "CREATE USER IF NOT EXISTS '{{ mysql_repl_user }}'@'%' IDENTIFIED WITH mysql_native_password BY '{{ mysql_repl_password }}';"
+- name: Granting replication rights to user
+  shell: 
+    mysql -uroot -p"{{ mysql_root_password }}" -e "GRANT REPLICATION SLAVE ON *.* TO '{{ mysql_repl_user }}'@'%';"
+
+
+#- debug: msg='{{ position }}'

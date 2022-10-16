@@ -1,0 +1,23 @@
+---
+- name: MySQL replication master server setup
+  become: yes
+  hosts: mysql-master
+  gather_facts: false
+ vars_files:
+    - vars.default.yml
+    - vars.yml
+  tasks:
+    - import_tasks: mysql-master-tasks.yml
+      when: mysql_install == 1
+      
+- name: MySQL replication slave server setup
+  become: yes
+  hosts: mysql-slave
+  gather_facts: false
+ vars_files:
+    - vars.default.yml
+    - vars.yml
+  tasks:
+    - import_tasks: mysql-slave-tasks.yml
+      when: mysql_install == 1
+

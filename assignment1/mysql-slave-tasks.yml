@@ -1,0 +1,35 @@
+#- debug: var=groups['mysql-master'][0]
+#- debug: msg='{{ hostvars[groups['mysql-master'][0]]['bin_log_name'][0] }}'
+#- debug: msg='{{ hostvars[groups['mysql-master'][0]]['position'][0] }}'
+
+- lineinfile:
+    path: /etc/my.cnf
+    regexp: '^\s*server-id\s*='
+    line: 'server-id = {{ server_id }}'
+- lineinfile:
+    path: /etc/my.cnf
+    regexp: '^\s*log_bin\s*='
+    line: 'log_bin = mysql-bin'
+- name: Restarting mysqld
+  systemd: name=mysqld state=restarted
+
+- name: Stop the slave threads
+  command: 
+    mysql -uroot -p"{{ mysql_root_password }}" -e "STOP SLAVE;"
+- set_fact:
+    cmd_line: >
+      mysql -uroot -p"{{ mysql_root_password }}" -e 
+      "CHANGE MASTER TO MASTER_HOST='{{ groups['mysql-master'][0] }}', 
+      MASTER_USER='{{ mysql_repl_user }}', 
+      MASTER_PASSWORD='{{ mysql_repl_password }}', 
+      MASTER_LOG_FILE='{{ hostvars[groups['mysql-master'][0]]['bin_log_name'][0] }}', 
+      MASTER_LOG_POS={{ hostvars[groups['mysql-master'][0]]['position'][0] }};"
+#- debug: var=cmd_line
+- name: Setting the Source Configuration on the Replica
+  command: '{{ cmd_line }}'
+#  register: out1
+#- debug: var=out1
+
+- name: Start the slave threads
+  command: 
+    mysql -uroot -p"{{ mysql_root_password }}" -e "START SLAVE;"

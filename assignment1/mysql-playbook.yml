@@ -1,0 +1,16 @@
+---
+- name: MySQL server(s) setup
+  become: yes
+  hosts: centos 
+  gather_facts: false
+  vars_files:
+    - vars.default.yml
+    - vars.yml
+
+  tasks:
+    - import_tasks: mysql-tasks.yml
+      when: mysql_install == 1
+
+- name: MySQL replication setup
+  import_playbook: mysql-repl-playbook.yml
+  when: mysql_replication == 1
