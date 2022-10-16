@@ -1,42 +1,49 @@
 ---
+## Prepare webtutor image to run
+
 # - name: Upack image tar
 #   unarchive:
 #     src: /mnt/parent/D/Soft/hcm_2022.1.3.441.tar.gz
 #     dest: /tmp
+
+- name: include local specific variables
+  ansible.builtin.include_vars: 
+    file: .main
+
 
 - name: Checking if image {{ img_name }} exists  # Inspect image
   community.docker.docker_image_info:
     name: "websoft/hcm:2022.1.3.441"
   register: img
 
-- debug:
-    msg: "Result: {{ img }}"
+# - debug:
+#     msg: "Result: {{ img }}"
 
 # - name: Checking image exists locally
 #   ansible.builtin.assert:
 #     that:
 #       - result.images | length == 1
 
-- name: Checking if image tar {{ img_dst_dir }}/{{ img_name }}.tar exists
+- name: Checking if image tar {{ img_file_dst_dir }}/{{ img_name }}.tar exists
   stat:
-    path: "{{ img_dst_dir }}/{{ img_name }}.tar"
+    path: "{{ img_file_dst_dir }}/{{ img_name }}.tar"
   register: img_tar
   when: "img.images | length == 0"
 
 # - debug:
-#     msg: "File {{ img_dst_dir }}/{{ img_name }}.tar doesn't exists"
+#     msg: "File {{ img_file_dst_dir }}/{{ img_name }}.tar doesn't exists"
 #   when: "not img_tar.stat.exists"
 
-- name: Copying image tar.gz
+- name: Copying image tar.gz if tar doesn't exists
   ansible.builtin.copy:
-    src: "{{ img_src_dir }}/{{ img_name }}.tar.gz"
+    src: "{{ img_file_src_dir }}/{{ img_name }}.tar.gz"
     dest: /tmp
     force: no
   when: "(img.images | length == 0) and not img_tar.stat.exists"
 
-- name: Unarchive image tar
+- name: Unarchiving image tar from tar.gz
   ansible.builtin.shell:
-    cmd: "gunzip -dk {{ img_dst_dir }}/{{ img_name }}.tar.gz"
+    cmd: "gunzip -dk {{ img_file_dst_dir }}/{{ img_name }}.tar.gz"
   register: result
   when: "(img.images | length == 0) and not img_tar.stat.exists"
 
@@ -47,17 +54,16 @@
 
 # - name: Load image from tar file
 #   community.docker.docker_image_load:
-#     path: "{{ img_dst_dir }}/{{ img_name }}.tar"
+#     path: "{{ img_file_dst_dir }}/{{ img_name }}.tar"
 #   register: result
 
 - name: Loading image from tar file
   community.docker.docker_image:
     name: websoft/hcm:2022.1.3.441
     source: load
-    load_path: "{{ img_dst_dir }}/{{ img_name }}.tar"
+    load_path: "{{ img_file_dst_dir }}/{{ img_name }}.tar"
     timeout: 300
   register: result
 
-- ansible.builtin.debug:
-    msg: "Loaded images: {{ result }}"  #  | join(', ')
-
+# - ansible.builtin.debug:
+#     msg: "Loaded images: {{ result }}"  #  | join(', ')

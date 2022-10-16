@@ -16,6 +16,7 @@
       - curl
       - wget
       - tcpdump
-  #    - nmap
       - dialog
       - sshfs
+      - rsync
+  #    - nmap  # absent in Astra Linux

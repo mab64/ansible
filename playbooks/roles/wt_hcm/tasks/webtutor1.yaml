@@ -1,0 +1,35 @@
+---
+## Prepare and run webtutor container
+
+- name: include local specific variables
+  ansible.builtin.include_vars: 
+    file: .main
+
+- name: Creating app folder
+  ansible.builtin.file:
+    path: "{{ app_path }}"
+    state: directory
+    # mode: "02775"
+    # owner: "{{ app_user }}"
+    # group : "{{ app_user }}"
+
+- name: Creating app subfolders
+  ansible.builtin.file:
+    path: "{{ app_path }}/{{ item }}"
+    state: directory
+  loop:
+  - Logs
+  - files
+  - ft-idx
+  - storage
+  - wt/web/webtutor
+  - wt_data
+  
+  # vars:
+  #   subdirs:
+  #   - Logs
+    # - "{{ app_path }}/files"
+    # - "{{ app_path }}/ft-idx"
+    # - "{{ app_path }}/storage"
+    # - "{{ app_path }}/wt/web/webtutor"
+    # - "{{ app_path }}/wt_data"

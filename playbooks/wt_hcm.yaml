@@ -2,6 +2,8 @@
 - name: Install Webtutor
   hosts: wt
   gather_facts: false
+  # vars_file:
+  
 
   roles:
     - role: wt_hcm

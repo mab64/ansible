@@ -1,2 +1,4 @@
-# - include: docker.yaml
-- include: webtutor.yaml
+# - import_tasks: docker.yaml
+# - include_tasks: webtutor.yaml
+# - import_tasks: webtutor.yaml
+- import_tasks: webtutor1.yaml
