@@ -12,7 +12,7 @@
 
 - name: Copy .vimrc file
   ansible.builtin.copy:
-    src: ".vimrc"
-    dest: "~/"
+    src: "vimrc"
+    dest: "~/.vimrc"
     mode: 0640
 
