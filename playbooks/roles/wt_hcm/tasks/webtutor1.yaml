@@ -1,6 +1,8 @@
 ---
 ## Prepare and run webtutor container
 
+# - debug: msg="Host - {{ inventory_hostname }}"
+
 - name: include local specific variables
   ansible.builtin.include_vars: 
     file: .main
@@ -13,17 +15,19 @@
     # owner: "{{ app_user }}"
     # group : "{{ app_user }}"
 
-- name: Creating app subfolders
-  ansible.builtin.file:
-    path: "{{ app_path }}/{{ item }}"
-    state: directory
-  loop:
-  - Logs
-  - files
-  - ft-idx
-  - storage
-  - wt/web/webtutor
-  - wt_data
+# - name: Creating app subfolders
+#   ansible.builtin.file:
+#     path: "{{ app_path }}/{{ item }}"
+#     state: directory
+#   loop:
+#   - Logs
+#   - files
+#   - ft-idx
+#   - storage
+#   - wt/web/webtutor
+#   - wt/web/pics
+#   - wt_data
+#   - wtv/libs
   
   # vars:
   #   subdirs:
@@ -33,3 +37,23 @@
     # - "{{ app_path }}/storage"
     # - "{{ app_path }}/wt/web/webtutor"
     # - "{{ app_path }}/wt_data"
+
+# - name: Webtutor container 1st time run
+#   ansible.builtin.shell:
+#     cmd: "docker run -it -p 80:80 --name webtutor websoft/hcm:2022.1.3.441 ./xhttp.out"
+#   register: result
+
+- name: Start a container with a command
+  community.docker.docker_container:
+    name: webtutor
+    image: "{{ img_name }}"
+    container_default_behavior: no_defaults
+    interactive: yes
+    tty: yes
+    command: ['./xhttp.out']
+    state: started
+
+# - name: Pause for container ready
+#   ansible.builtin.pause:
+#     minutes: 1
+
