@@ -19,4 +19,5 @@
       - dialog
       - sshfs
       - rsync
+      - tree
   #    - nmap  # absent in Astra Linux

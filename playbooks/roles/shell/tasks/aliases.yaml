@@ -1,0 +1,35 @@
+- name: Creating .bash_aliases file
+  file:
+    path: "{{ aliases_file }}"
+    mode: "0640"
+    state: touch
+    modification_time: preserve
+    access_time: preserve
+
+- name: Setting alias ls
+  lineinfile:
+    path: "{{ aliases_file }}"
+    regexp: "^( *)#*( *)(alias ls=.*)$"
+    line: alias ls='ls --color=auto --group-directories-first'
+    # insertbefore: 'alias ll='
+    state: present
+    # backrefs: yes
+
+- name: Setting alias ll
+  lineinfile:
+    path: "{{ aliases_file }}"
+    regexp: '^ *# *alias ll=.*$'
+    line: alias ll='ls -alF'
+
+- name: Setting alias la
+  lineinfile:
+    path: "{{ aliases_file }}"
+    regexp: '^\s*#\s*alias la=.*$'
+    line: alias la='ls -A'
+
+- name: Setting alias l
+  lineinfile:
+    path: "{{ aliases_file }}"
+    regexp: '^\s*#\s*alias l=.*$'
+    line: alias l='ls -CF'
+  # when: "not result.changed"

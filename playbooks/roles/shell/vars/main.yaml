@@ -1,4 +1,5 @@
 bashrc_file: "~/.bashrc"
+aliases_file: "~/.bash_aliases"
 inputrc_file: "~/.inputrc"
 vimrc_file: "~/.vimrc"
 vim_dir: "~/.vim"

@@ -1,3 +1,4 @@
 - include: bashrc.yaml
+- include: aliases.yaml
 - include: inputrc.yaml
 - include: vimrc.yaml
