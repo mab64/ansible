@@ -9,7 +9,11 @@ all:
       hosts:
         localhost:
           ansible_connection: local
-    wt:
+    wt_redis:
+      hosts:
+        localhost:
+          ansible_connection: local
+    wt_hcm:
       hosts:
         localhost:
           ansible_connection: local

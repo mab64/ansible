@@ -1,0 +1,87 @@
+---
+# .bashrc
+- name: Create .bashrc file
+  file:
+    path: "{{ bashrc_file }}"
+    mode: "0640"
+    state: touch
+    modification_time: preserve
+    access_time: preserve
+
+
+- name: Setting HISTCONTROL
+  lineinfile:
+    path: "{{ bashrc_file }}"
+    regexp: '^[ #]*HISTCONTROL='
+    line: 'HISTCONTROL=ignoreboth:erasedups'
+
+- name: Setting HISTIGNORE
+  lineinfile:
+    path: "{{ bashrc_file }}"
+    regexp: '^[ #]*HISTIGNORE='
+    line: 'HISTIGNORE="?:??:$HISTIGNORE"'
+
+- name: Setting HISTSIZE
+  lineinfile:
+    path: "{{ bashrc_file }}"
+    regexp: '^[ #]*HISTSIZE='
+    line: 'HISTSIZE=5000'
+
+- name: Setting HISTFILESIZE
+  lineinfile:
+    path: "{{ bashrc_file }}"
+    regexp: '^[ #]*HISTFILESIZE='
+    line: 'HISTFILESIZE=3000'
+
+- name: Setting PS1
+  lineinfile:
+    path: "{{ bashrc_file }}"
+    regexp: '^#? ?PS1='
+    line: 'PS1="\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\W\[\033[00m\]\$ "'
+
+# - name: Set alias ls
+#   lineinfile:
+#     path: "{{ bashrc_file }}"
+#     regexp: "^( *)#*( *)(alias ls=.*)'$"
+#     line: \1\2\3 --group-directories-first'
+#     backrefs: yes
+
+- name: Uncomment alias ll
+  lineinfile:
+    path: "{{ bashrc_file }}"
+    regexp: '^[# ]*(alias ll=.*)$'
+    line: '\1'
+    state: present
+    backrefs: yes
+
+- name: Insert alias ll if absent
+  lineinfile:
+    path: "{{ bashrc_file }}"
+    line: alias ll='ls -alF'
+
+- name: Uncomment alias la
+  lineinfile:
+    path: "{{ bashrc_file }}"
+    regexp: '^[# ]*(alias la=.*)$'
+    line: '\1'
+    state: present
+    backrefs: yes
+
+- name: Insert alias la if absent
+  lineinfile:
+    path: "{{ bashrc_file }}"
+    line: alias la='ls -A'
+
+- name: Uncomment alias l if present
+  lineinfile:
+    path: "{{ bashrc_file }}"
+    regexp: '^[# ]*(alias l=.*)$'
+    line: '\1'
+    backrefs: yes
+  # register: result
+
+- name: Insert alias l if absent
+  lineinfile:
+    path: "{{ bashrc_file }}"
+    line: alias l='ls -CF'
+  # when: "not result.changed"

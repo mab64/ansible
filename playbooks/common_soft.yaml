@@ -2,22 +2,22 @@
 - name: Install software
   gather_facts: false
   hosts: all
-  
+
   tasks:
   - name: Install common software
     apt:
       name: "{{ packages }}"
     vars:
       packages:
-      - net-tools
-      - dnsutils
-      - nfs-common
-      - postgresql-client
-      - curl
-      - wget
-      - tcpdump
-      - dialog
-      - sshfs
-      - rsync
-      - tree
-  #    - nmap  # absent in Astra Linux
+        - net-tools
+        - dnsutils
+        - nfs-common
+        - postgresql-client
+        - curl
+        - wget
+        - tcpdump
+        - dialog
+        - sshfs
+        - rsync
+        - tree
+        # - nmap  # absent in Astra Linux

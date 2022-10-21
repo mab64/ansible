@@ -1,0 +1,55 @@
+---
+- name: Install Redis
+  hosts: wt_redis
+  gather_facts: false
+  vars:
+    redis_conf: "/etc/redis/redis.conf"
+    redis_service: redis
+    redis_password: 12345
+  # vars_file:
+
+  # roles:
+  #   - role: wt_redis
+
+  tasks:
+    - name: Installing Redis server
+      apt:
+        name: redis
+        state: present
+
+    - name: "Configuring Redis: bind"
+      ansible.builtin.lineinfile:
+        path: "{{ redis_conf }}"
+        regexp: '^bind .*$'
+        line: bind 0.0.0.0
+        # backup: yes
+      notify: Restarting Redis server
+
+    - name: "Configuring Redis: save"
+      ansible.builtin.replace:
+        path: "{{ redis_conf }}"
+        regexp: '^(save .*)$'
+        replace: '#\1'
+        # backup: yes
+      notify: Restarting Redis server
+
+    - name: "Configuring Redis password"
+      ansible.builtin.lineinfile:
+        path: "{{ redis_conf }}"
+        regexp: '^#* *requirepass *$'
+        line: "requirepass {{ redis_password }}"
+        # backup: yes
+      notify: Restarting Redis server
+
+  # - name: "Configuring Redis daemon"
+  #   ansible.builtin.systemd:
+  #     name: redis
+  #     enabled: yes
+  #     state: started
+
+  handlers:
+    - name: Restarting Redis server
+      systemd: 
+        name: "{{ redis_service }}" 
+        state: restarted
+        # daemon_reload: yes

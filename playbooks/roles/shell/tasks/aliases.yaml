@@ -28,8 +28,12 @@
     line: alias la='ls -A'
 
 - name: Setting alias l
-  lineinfile:
+  # lineinfile:
+  #   path: "{{ aliases_file }}"
+  #   regexp: '^\s*#\s*alias l=.*$'
+  #   line: alias l='ls -CF'
+  # when: "not result.changed"
+  replace:
     path: "{{ aliases_file }}"
     regexp: '^\s*#\s*alias l=.*$'
-    line: alias l='ls -CF'
-  # when: "not result.changed"
+    replace: alias l='ls -CF'
