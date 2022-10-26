@@ -4,20 +4,47 @@
   hosts: all
 
   tasks:
+  # - name: Install common software
+  #   apt:
+  #     name: "{{ packages }}"
+  #   vars:
+  #     packages:
+  #       - net-tools
+  #       - dnsutils
+  #       - nfs-common
+  #       - postgresql-client
+  #       - curl
+  #       - wget
+  #       - tcpdump
+  #       - dialog
+  #       - sshfs
+  #       - rsync
+  #       - tree
+  #       - ntp
+  #       # - nmap  # absent in Astra Linux
+
   - name: Install common software
     apt:
-      name: "{{ packages }}"
-    vars:
-      packages:
-        - net-tools
-        - dnsutils
-        - nfs-common
-        - postgresql-client
-        - curl
-        - wget
-        - tcpdump
-        - dialog
-        - sshfs
-        - rsync
-        - tree
-        # - nmap  # absent in Astra Linux
+      name: "{{ item }}"
+      update_cache: yes
+    loop:
+      - net-tools
+      - dnsutils
+      - nfs-common
+      - postgresql-client
+      - curl
+      - wget
+      - tcpdump
+      - sshfs
+      - rsync
+      - tree
+      - ntp
+      # - dialog  # not needed for a while
+      # - nmap  # absent in Astra Linux
+
+  - name: Configuring ntp daemon
+    ansible.builtin.systemd:
+      name: ntp
+      enabled: yes
+      masked: no
+      state: started
