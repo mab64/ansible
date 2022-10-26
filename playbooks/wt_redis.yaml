@@ -6,7 +6,9 @@
     redis_conf: "/etc/redis/redis.conf"
     redis_service: redis
     redis_password: 12345
-  # vars_file:
+    redis_maxmemory: 1000000000
+  vars_files:  # Reassign vars
+    .wt_redis.vars
 
   # roles:
   #   - role: wt_redis
@@ -33,23 +35,33 @@
         # backup: yes
       notify: Restarting Redis server
 
+    # - name: "Generaring Redis password"
+    #   ansible.builtin.shell:
+    #     cmd: "< /dev/urandom tr -dc [:alnum:]_ | head -c 20 ; echo"
+    #   register: password
+
+    # - ansible.builtin.debug:
+    #     var: password
+
     - name: "Configuring Redis password"
       ansible.builtin.lineinfile:
         path: "{{ redis_conf }}"
-        regexp: '^#* *requirepass *$'
+        regexp: '^#* *requirepass .*$'
         line: "requirepass {{ redis_password }}"
         # backup: yes
       notify: Restarting Redis server
 
-  # - name: "Configuring Redis daemon"
-  #   ansible.builtin.systemd:
-  #     name: redis
-  #     enabled: yes
-  #     state: started
+    - name: "Configuring Redis maxmemory"
+      ansible.builtin.lineinfile:
+        path: "{{ redis_conf }}"
+        regexp: '^#* *maxmemory '
+        line: "maxmemory {{ redis_maxmemory }}"
+        # backup: yes
+      notify: Restarting Redis server
 
   handlers:
     - name: Restarting Redis server
-      systemd: 
-        name: "{{ redis_service }}" 
+      ansible.builtin.systemd:
+        name: "{{ redis_service }}"
         state: restarted
         # daemon_reload: yes
