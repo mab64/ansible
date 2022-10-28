@@ -23,7 +23,7 @@
   #       - ntp
   #       # - nmap  # absent in Astra Linux
 
-  - name: Install common software
+  - name: Installing packages
     apt:
       name: "{{ item }}"
       update_cache: yes
@@ -39,12 +39,20 @@
       - rsync
       - tree
       - ntp
+      - zabbix-agent
       # - dialog  # not needed for a while
       # - nmap  # absent in Astra Linux
 
   - name: Configuring ntp daemon
     ansible.builtin.systemd:
       name: ntp
+      enabled: yes
+      masked: no
+      state: started
+
+  - name: Configuring zabbix-agent daemon
+    ansible.builtin.systemd:
+      name: zabbix-agent
       enabled: yes
       masked: no
       state: started

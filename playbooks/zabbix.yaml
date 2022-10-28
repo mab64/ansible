@@ -1,0 +1,102 @@
+---
+- name: Zabbix Agent play
+  hosts: zabbix_agents
+  gather_facts: false
+  vars:
+    optional_vars_file: "{{ lookup('first_found', '.zabbix.vars', errors='ignore') }}"
+    zabbix_owner: zabbix
+    zabbix_conf: "/etc/zabbix/zabbix_agentd.conf"
+    zabbix_service: zabbix-agent
+    zabbix_server: "127.0.0.1"
+    zabbix_tlsaccept: unencrypted,psk
+    zabbix_tlspskidentity: PSK001
+    zabbix_tlspskfile_src: "./files/.zabbix_psk001"
+    zabbix_tlspskfile_dst: /etc/zabbix/psk001
+    pskfile: "{{ lookup('first_found', zabbix_tlspskfile_src, errors='ignore') }}"
+  # vars_files:  # Reassign vars
+  #   - [ ".zabbix.vars", ]
+
+  # roles:
+  #   - role: zabbix
+
+  tasks:
+    - name: Loading variables from file if exists
+      include_vars: "{{ optional_vars_file }}"
+      when: optional_vars_file is file
+
+    - name: Installing Zabbix agent
+      apt:
+        name: zabbix-agent
+        state: present
+
+    - name: "Configuring Zabbix server(s) IPs"
+      ansible.builtin.lineinfile:
+        path: "{{ zabbix_conf }}"
+        regexp: '^Server *='
+        line: "Server={{ zabbix_server }}"
+        # backup: yes
+      notify: Restarting Zabbix agent
+
+    - name: Copying PSK file
+      ansible.builtin.copy:
+        src: "{{ zabbix_tlspskfile_src }}"
+        dest: "{{ zabbix_tlspskfile_src }}"
+        group: "{{ zabbix_owner }}"
+        mode: 0640
+      # when: pskfile.stat.exists
+      when: pskfile is file
+
+    # - name: Checking if PSK file exists
+    #   ansible.builtin.stat:
+    #     path: "{{ zabbix_tlspskfile_src }}"
+    #   register: pskfile
+    # - ansible.builtin.debug:
+    #     var: zabbix_tlspskfile_src
+
+    - name: "Configuring Zabbix TLSAccept"
+      ansible.builtin.lineinfile:
+        path: "{{ zabbix_conf }}"
+        regexp: '^TLSAccept *='
+        line: "TLSAccept={{ zabbix_tlsaccept }}"
+        insertafter: '^# *TLSAccept'
+        # backup: yes
+      # when: pskfile.stat.exists
+      when: pskfile is file
+      notify: Restarting Zabbix agent
+
+    - name: "Configuring Zabbix TLSPSKIdentity"
+      ansible.builtin.lineinfile:
+        path: "{{ zabbix_conf }}"
+        regexp: '^TLSPSKIdentity *='
+        line: "TLSPSKIdentity={{ zabbix_tlspskidentity }}"
+        insertafter: '^# *TLSPSKIdentity'
+        # backup: yes
+      # when: pskfile.stat.exists
+      when: pskfile is file
+      notify: Restarting Zabbix agent
+
+    - name: "Configuring Zabbix TLSPSKFile"
+      ansible.builtin.lineinfile:
+        path: "{{ zabbix_conf }}"
+        regexp: '^TLSPSKFile *='
+        line: "TLSPSKFile={{ zabbix_tlspskfile_dst }}"
+        insertafter: '^# *TLSPSKFile'
+        # backup: yes
+      # when: pskfile.stat.exists
+      when: pskfile is file
+      notify: Restarting Zabbix agent
+
+  #   - name: "Configuring Redis password"
+  #     ansible.builtin.lineinfile:
+  #       path: "{{ redis_conf }}"
+  #       regexp: '^#* *requirepass .*$'
+  #       line: "requirepass {{ redis_password }}"
+  #       # backup: yes
+  #     notify: Restarting Redis server
+
+  handlers:
+    - name: Restarting Zabbix agent
+      ansible.builtin.systemd:
+        name: "{{ zabbix_service }}"
+        state: restarted
+        # daemon_reload: yes
