@@ -1,0 +1,32 @@
+---
+all:
+  # hosts:
+  children:
+    zabbix_agents:
+      children:
+        zabbix_agents_deb:
+          hosts:
+            192.168.0.100:
+        zabbix_agents_rhel:
+          hosts:
+            192.168.0.100:
+    db_postgres:
+      hosts:
+        192.168.0.100:
+    wt:
+      children:
+        wt_worker:
+          hosts:
+            192.168.0.100:
+        wt_web:
+          hosts:
+            192.168.0.100:
+    # wt:
+    #   children:
+    #     wt_worker:
+    #     wt_web:
+    wt_ldap:
+      hosts:
+        192.168.0.100:
+  vars:
+    ansible_user: ''
