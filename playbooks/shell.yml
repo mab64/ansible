@@ -2,17 +2,13 @@
 - name: Shell tune up
   hosts: all
   gather_facts: false
-  become: no
+  become: false
   # become_user: user
   # vars:
   #   bashrc_file: "~/.bashrc"
   #   inputrc_file: "~/.inputrc"
 
   roles:
-    # - role: bashrc
-    # - role: inputrc
     - role: shell
 
-  tasks:
-  
-
+  # tasks:
