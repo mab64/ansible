@@ -1,37 +1,12 @@
 ---
 - name: Install software
-  gather_facts: false
+  gather_facts: true
   hosts: all
-
-  tasks:
-  # - name: Install common software
-  #   apt:
-  #     name: "{{ packages }}"
-  #   vars:
-  #     packages:
-  #       - net-tools
-  #       - dnsutils
-  #       - nfs-common
-  #       - postgresql-client
-  #       - curl
-  #       - wget
-  #       - tcpdump
-  #       - dialog
-  #       - sshfs
-  #       - rsync
-  #       - tree
-  #       - ntp
-  #       # - nmap  # absent in Astra Linux
-
-  - name: Installing packages
-    apt:
-      name: "{{ item }}"
-      update_cache: yes
-    loop:
+  vars:
+    packages:
       - net-tools
-      - dnsutils
       - nfs-common
-      - postgresql-client
+      # - postgresql-client
       - curl
       - wget
       - tcpdump
@@ -42,6 +17,31 @@
       - zabbix-agent
       # - dialog  # not needed for a while
       # - nmap  # absent in Astra Linux
+    packages_deb:
+      - dnsutils
+    packages_rhel:
+      - bind-utils
+      
+
+  tasks:
+  - name: Printing OS Family
+    ansible.builtin.debug:
+      # var: ansible_facts['distribution']
+      var: ansible_facts['os_family']
+
+  - name: Installing packages by apt
+    apt:
+      name: "{{ item }}"
+      update_cache: yes
+    loop: "{{ packages }}"
+    when: ansible_facts['os_family'] in ["Debian", "Astra Linux"]
+
+  - name: Installing packages by dnf
+    ansible.builtin.dnf:
+      name: "{{ item }}"
+      # update_cache: yes
+    loop: "{{ packages }}"
+    when: ansible_facts['os_family'] == "RedHat"
 
   - name: Configuring ntp daemon
     ansible.builtin.systemd:

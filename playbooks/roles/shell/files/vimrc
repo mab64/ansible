@@ -9,6 +9,7 @@ set smartcase
 set ignorecase
 set incsearch
 set hlsearch
+set smartindent
 
 set tabstop=4
 set softtabstop=4

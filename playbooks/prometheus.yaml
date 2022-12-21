@@ -1,0 +1,13 @@
+---
+- name: Node exporter installation
+  hosts: localhost # monitoring_agents
+  gather_facts: false
+  vars:
+    node_exporter_conf: asdf
+  vars_files:  # Reassign variables
+    - [ ".prometheus.vars", ]
+
+  tasks:
+    # - ansible.builtin.debug:
+    #     var: node_exporter_conf
+
