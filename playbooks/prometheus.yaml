@@ -1,13 +1,53 @@
 ---
 - name: Node exporter installation
-  hosts: localhost # monitoring_agents
+  hosts: monitoring_agents_deb # monitoring_agents
   gather_facts: false
+  # become: true
   vars:
-    node_exporter_conf: asdf
+    # node_exporter_conf: asdf
+    node_exporter_name: node_exporter
+    node_exporter_path: /usr/local/sbin
+    # node_exporter_service_name: node_exporter
+    # node_exporter_url: https://github.com/prometheus/node_exporter/releases/download/v1.5.0/node_exporter-1.5.0.linux-amd64.tar.gz
+    node_exporter_local_dir: /home/ma/install/node_exporter-1.5.0.linux-amd64
+    prometheus_config_location: /var/lib/docker/volumes/grafana-docker-stack_prom-configs/_data/prometheus.yml
   vars_files:  # Reassign variables
     - [ ".prometheus.vars", ]
 
   tasks:
-    # - ansible.builtin.debug:
-    #     var: node_exporter_conf
 
+  # - name: Checking if node exporter executable exists
+  #   stat:
+  #     path: "{{ node_exporter_name }}"
+  #   register: file_exists
+
+  # - ansible.builtin.debug:
+  #     var: file_exists
+
+  # - name: Downloading archive if executable doesn't exists
+  #   ansible.builtin.get_url:
+  #     url: "{{ node_exporter_url }}"
+  #     dest: /tmp/
+  #     # mode: '0440'
+  #     when: file_exists.stat.exists
+
+  - name: Copying node exporter executable
+    ansible.builtin.copy:
+      src: "{{ node_exporter_local_dir }}/{{ node_exporter_name }}"
+      dest: "{{ node_exporter_path }}/{{ node_exporter_name }}"
+      mode: 0755
+    notify: Restarting node_exporter
+
+  - name: Creating systemd node_exporter startup file
+    ansible.builtin.copy:
+      src: ./files/node_exporter.service
+      dest: /etc/systemd/system/node_exporter.service
+      mode: 0644
+    notify: Restarting node_exporter
+
+  handlers:
+  - name: Restarting node_exporter
+    ansible.builtin.systemd:
+      name: "{{ node_exporter_name }}"
+      state: restarted
+      daemon_reload: true
