@@ -9,31 +9,37 @@
 - name: Setting alias ls
   lineinfile:
     path: "{{ aliases_file }}"
-    regexp: "^( *)#*( *)(alias ls=.*)$"
+    regexp: '^\s*#*\s*alias ls=.*$'
     line: alias ls='ls --color=auto --group-directories-first'
     # insertbefore: 'alias ll='
     state: present
     # backrefs: yes
 
+- name: Setting alias l
+  lineinfile:
+    path: "{{ aliases_file }}"
+    regexp: '^\s*#*\s*alias l=.*$'
+    line: alias l='ls -CF'
+  # when: "not result.changed"
+  # replace:
+  #   path: "{{ aliases_file }}"
+  #   regexp: '^\s*#\s*alias l=.*$'
+  #   replace: alias l='ls -CF'
+
 - name: Setting alias ll
   lineinfile:
     path: "{{ aliases_file }}"
-    regexp: '^ *# *alias ll=.*$'
-    line: alias ll='ls -alF'
+    regexp: '^\s*#*\s*alias ll=.*$'
+    line: alias ll='ls -lF'
 
 - name: Setting alias la
   lineinfile:
     path: "{{ aliases_file }}"
-    regexp: '^\s*#\s*alias la=.*$'
+    regexp: '^\s*#*\s*alias la=.*$'
     line: alias la='ls -A'
 
-- name: Setting alias l
-  # lineinfile:
-  #   path: "{{ aliases_file }}"
-  #   regexp: '^\s*#\s*alias l=.*$'
-  #   line: alias l='ls -CF'
-  # when: "not result.changed"
-  replace:
+- name: Setting alias lla
+  lineinfile:
     path: "{{ aliases_file }}"
-    regexp: '^\s*#\s*alias l=.*$'
-    replace: alias l='ls -CF'
+    regexp: '^\s*#*\s*alias lla=.*$'
+    line: alias lla='ls -alF'
