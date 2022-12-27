@@ -1,15 +1,20 @@
 ---
 - name: Node exporter installation
-  hosts: monitoring_agents_deb # monitoring_agents
+  hosts: all # monitoring_agents_deb # monitoring_agents
   gather_facts: false
   # become: true
   vars:
     # node_exporter_conf: asdf
-    node_exporter_name: node_exporter
+    node_exporter_local_dir: /home/ma/install/node_exporter-1.5.0.linux-amd64
+    node_exporter_file: node_exporter
+    node_exporter_name: node-exporter
     node_exporter_path: /usr/local/sbin
+    node_exporter_config_path: /etc/node-exporter
+    node_exporter_config_file: "{{ node_exporter_config_path }}/config.yml"
+    node_exporter_tls_key: node-exporter.key
+    node_exporter_tls_crt: node-exporter.crt
     # node_exporter_service_name: node_exporter
     # node_exporter_url: https://github.com/prometheus/node_exporter/releases/download/v1.5.0/node_exporter-1.5.0.linux-amd64.tar.gz
-    node_exporter_local_dir: /home/ma/install/node_exporter-1.5.0.linux-amd64
     prometheus_config_location: /var/lib/docker/volumes/grafana-docker-stack_prom-configs/_data/prometheus.yml
   vars_files:  # Reassign variables
     - [ ".prometheus.vars", ]
@@ -31,10 +36,18 @@
   #     # mode: '0440'
   #     when: file_exists.stat.exists
 
+  - name: Creating user {{ node_exporter_name }}
+    ansible.builtin.user:
+      name: "{{ node_exporter_name }}"
+      # comment: John Doe
+      shell: /usr/sbin/nologin
+      home: /usr/local/sbin
+      create_home: false
+
   - name: Copying node exporter executable
     ansible.builtin.copy:
-      src: "{{ node_exporter_local_dir }}/{{ node_exporter_name }}"
-      dest: "{{ node_exporter_path }}/{{ node_exporter_name }}"
+      src: "{{ node_exporter_local_dir }}/{{ node_exporter_file }}"
+      dest: "{{ node_exporter_path }}/{{ node_exporter_file }}"
       mode: 0755
     notify: Restarting node_exporter
 
@@ -42,6 +55,41 @@
     ansible.builtin.copy:
       src: ./files/node_exporter.service
       dest: /etc/systemd/system/node_exporter.service
+      mode: 0644
+    notify: Restarting node_exporter
+
+  - name: node exporter "Auth" configuration block
+    ansible.builtin.lineinfile:
+      path: "{{ node_exporter_config_file }}"
+      create: true
+      # regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+      with_items:
+        - { line: 'basic_auth_users\:' }
+        - { line: '  {{ node_exporter_auth_user }}\: {{ node_exporter_auth_password }}' }
+    notify: Restarting node_exporter
+
+  - name: node exporter "TLS" configuration block
+    ansible.builtin.blockinfile:
+      path: "{{ node_exporter_config_file }}"
+      # create: true
+      block: |
+        tls_server_config:
+          cert_file: node-exporter.crt
+          key_file: node-exporter.key
+    notify: Restarting node_exporter
+
+  - name: Copying node exporter TLS key
+    ansible.builtin.copy:
+      src: "./.files/{{ node_exporter_tls_key }}"
+      dest: "{{ node_exporter_config_path }}/{{ node_exporter_tls_key }}"
+      mode: 0644
+    notify: Restarting node_exporter
+
+  - name: Copying node exporter TLS cert
+    ansible.builtin.copy:
+      src: "./.files/{{ node_exporter_tls_crt }}"
+      dest: "{{ node_exporter_config_path }}/{{ node_exporter_tls_crt }}"
       mode: 0644
     notify: Restarting node_exporter
 
