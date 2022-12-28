@@ -51,25 +51,31 @@
       mode: 0755
     notify: Restarting node_exporter
 
-  - name: Creating systemd node_exporter startup file
+  - name: Creating systemd node exporter startup file
     ansible.builtin.copy:
-      src: ./files/node_exporter.service
-      dest: /etc/systemd/system/node_exporter.service
+      src: ./files/node-exporter.service
+      dest: /etc/systemd/system/{{ node_exporter_name }}.service
       mode: 0644
     notify: Restarting node_exporter
 
-  - name: node exporter "Auth" configuration block
+  - name: node exporter config Auth 1 
     ansible.builtin.lineinfile:
       path: "{{ node_exporter_config_file }}"
       create: true
-      # regexp: "{{ item.regexp }}"
-      line: "{{ item.line }}"
-      with_items:
-        - { line: 'basic_auth_users\:' }
-        - { line: '  {{ node_exporter_auth_user }}\: {{ node_exporter_auth_password }}' }
+      line: 'basic_auth_users:'
     notify: Restarting node_exporter
+    tags: auth
 
-  - name: node exporter "TLS" configuration block
+  - name: node exporter config Auth 2
+    ansible.builtin.lineinfile:
+      path: "{{ node_exporter_config_file }}"
+      create: true
+      line: "  {{ node_exporter_auth_user }}: {{ node_exporter_auth_password }}"
+      insertafter: '^basic_auth_users:'
+    notify: Restarting node_exporter
+    tags: auth
+
+  - name: node exporter config "TLS"
     ansible.builtin.blockinfile:
       path: "{{ node_exporter_config_file }}"
       # create: true
@@ -78,6 +84,7 @@
           cert_file: node-exporter.crt
           key_file: node-exporter.key
     notify: Restarting node_exporter
+    tags: tls
 
   - name: Copying node exporter TLS key
     ansible.builtin.copy:
@@ -85,6 +92,7 @@
       dest: "{{ node_exporter_config_path }}/{{ node_exporter_tls_key }}"
       mode: 0644
     notify: Restarting node_exporter
+    tags: tls
 
   - name: Copying node exporter TLS cert
     ansible.builtin.copy:
@@ -92,10 +100,12 @@
       dest: "{{ node_exporter_config_path }}/{{ node_exporter_tls_crt }}"
       mode: 0644
     notify: Restarting node_exporter
+    tags: tls
 
   handlers:
-  - name: Restarting node_exporter
+  - name: Restarting node exporter
     ansible.builtin.systemd:
       name: "{{ node_exporter_name }}"
       state: restarted
       daemon_reload: true
+      enabled: true
