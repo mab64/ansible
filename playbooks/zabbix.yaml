@@ -1,6 +1,6 @@
 ---
 - name: Zabbix Agent play
-  hosts: mon_srv  # zabbix_agents
+  hosts: all # mon_srv  # zabbix_agents
   gather_facts: true
   vars:
     optional_vars_file: "{{ lookup('first_found', '.zabbix.vars', errors='ignore') }}"

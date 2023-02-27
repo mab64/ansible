@@ -8,11 +8,12 @@
     node_exporter_local_dir: /home/ma/install/node_exporter-1.5.0.linux-amd64
     node_exporter_file: node_exporter
     node_exporter_name: node-exporter
-    node_exporter_path: /usr/local/sbin
+    node_exporter_path: /usr/local/bin
     node_exporter_config_path: /etc/node-exporter
     node_exporter_config_file: "{{ node_exporter_config_path }}/config.yml"
     node_exporter_tls_key: node-exporter.key
     node_exporter_tls_crt: node-exporter.crt
+    node_exporter_auth_user: prometheus
     # node_exporter_service_name: node_exporter
     # node_exporter_url: https://github.com/prometheus/node_exporter/releases/download/v1.5.0/node_exporter-1.5.0.linux-amd64.tar.gz
     prometheus_config_location: /var/lib/docker/volumes/grafana-docker-stack_prom-configs/_data/prometheus.yml
@@ -70,6 +71,7 @@
     ansible.builtin.lineinfile:
       path: "{{ node_exporter_config_file }}"
       create: true
+      regexp: '^  {{ node_exporter_auth_user }}: '
       line: "  {{ node_exporter_auth_user }}: {{ node_exporter_auth_password }}"
       insertafter: '^basic_auth_users:'
     notify: Restarting node_exporter
@@ -103,7 +105,7 @@
     tags: tls
 
   handlers:
-  - name: Restarting node exporter
+  - name: Restarting node_exporter
     ansible.builtin.systemd:
       name: "{{ node_exporter_name }}"
       state: restarted

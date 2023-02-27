@@ -20,11 +20,6 @@
     path: "{{ aliases_file }}"
     regexp: '^\s*#*\s*alias l=.*$'
     line: alias l='ls -CF'
-  # when: "not result.changed"
-  # replace:
-  #   path: "{{ aliases_file }}"
-  #   regexp: '^\s*#\s*alias l=.*$'
-  #   replace: alias l='ls -CF'
 
 - name: Setting alias ll
   lineinfile:
@@ -43,3 +38,9 @@
     path: "{{ aliases_file }}"
     regexp: '^\s*#*\s*alias lla=.*$'
     line: alias lla='ls -alF'
+
+- name: Setting alias s for sudo
+  lineinfile:
+    path: "{{ aliases_file }}"
+    regexp: '^\s*#*\s*alias s=.*$'
+    line: alias s='sudo'
