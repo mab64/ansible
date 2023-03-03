@@ -17,5 +17,5 @@ all:
       hosts:
         localhost:
           ansible_connection: local
-  vars:
-    ansible_become_pass: '{{ become_pass }}'
+  # vars:
+  #   ansible_become_pass: '{{ become_pass }}'

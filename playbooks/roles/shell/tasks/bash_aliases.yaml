@@ -1,0 +1,14 @@
+- name: Bash aliases
+  ansible.builtin.blockinfile:
+    path: "{{ aliases_file }}"
+    block: |
+      alias egrep='egrep --color=auto'
+      alias fgrep='fgrep --color=auto'
+      alias grep='grep --color=auto'
+      alias ls='ls --color=auto --group-directories-first --time-style=long-iso'
+      alias l='ls -CF'
+      alias la='ls -A'
+      alias ll='ls -lF'
+      alias lla='ls -alF'
+      alias du1='du -h -d 1 $1'
+      alias rename='function _rename() { for i in *$1*; do echo $1; echo $2; mv "$i" "${i/$1/$2}"; done }; _rename'
