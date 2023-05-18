@@ -1,6 +1,7 @@
 - name: Bash aliases
   ansible.builtin.blockinfile:
     path: "{{ aliases_file }}"
+    create: true
     block: |
       alias egrep='egrep --color=auto'
       alias fgrep='fgrep --color=auto'

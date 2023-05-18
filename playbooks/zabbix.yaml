@@ -136,4 +136,5 @@
       ansible.builtin.systemd:
         name: "{{ zabbix_service }}"
         state: restarted
+        enabled: true
         # daemon_reload: yes
