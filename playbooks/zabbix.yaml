@@ -85,7 +85,7 @@
     - name: Copying PSK file
       ansible.builtin.copy:
         src: "{{ zabbix_tlspskfile_src }}"
-        dest: "{{ zabbix_tlspskfile_src }}"
+        dest: "{{ zabbix_tlspskfile_dst }}"
         group: "{{ zabbix_owner }}"
         mode: 0640
       # when: pskfile.stat.exists

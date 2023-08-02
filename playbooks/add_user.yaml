@@ -1,0 +1,25 @@
+---
+- name: Create user(s)
+  become: yes
+  hosts: all
+  gather_facts: false
+  vars_files: add_user.users
+  # vars:
+  #   users:
+  #     - user: a.shchelkunov
+  #       password: aaa
+
+  tasks:
+    # - ansible.builtin.debug:
+    #     var: users
+
+    - name: Create user
+      user:
+        name: "{{ item.user }}"
+        home: "/home/{{ item.user }}"
+        comment: "{{ item.user }}@labmedia.su"
+        password: "{{ item.password | password_hash('sha512')}}"
+        update_password: on_create
+        shell: /bin/bash
+        groups: sudo
+      loop: "{{ users }}"
