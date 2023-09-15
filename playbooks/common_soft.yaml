@@ -4,24 +4,27 @@
   hosts: all
   vars:
     packages:
-      - net-tools
-      - nfs-common
+      # - nfs-common
       # - postgresql-client
       - curl
       - wget
       - tcpdump
-      - sshfs
       - rsync
       - tree
-      - ntp
-      - zabbix-agent
+      - net-tools
+      # - zabbix-agent
       # - dialog  # not needed for a while
       # - nmap  # absent in Astra Linux
+      - moreutils
     packages_deb:
       - dnsutils
+      - ntp
+      - sshfs
     packages_rhel:
       - bind-utils
-      
+      - chrony
+      - fuse-sshfs
+
 
   tasks:
   - name: Printing OS Family
@@ -36,11 +39,41 @@
     loop: "{{ packages }}"
     when: ansible_facts['os_family'] in ["Debian", "Astra Linux"]
 
+  - name: Installing Debian packages by apt
+    apt:
+      name: "{{ item }}"
+      update_cache: yes
+    loop: "{{ packages_deb }}"
+    when: ansible_facts['os_family'] in ["Debian", "Astra Linux"]
+
+  - name: Installing Epel repository
+    ansible.builtin.dnf:
+      name:
+        - epel-release
+      state: present
+    when: ansible_facts['os_family'] == "RedHat"
+
+  # - name: Enabling powertools repository
+  #   ansible.builtin.dnf:
+  #     name:
+  #       - powertools
+  #     state: present
+  #   when: ansible_facts['os_family'] == "RedHat"
+
   - name: Installing packages by dnf
     ansible.builtin.dnf:
       name: "{{ item }}"
       # update_cache: yes
+      enablerepo: ["powertools"]
     loop: "{{ packages }}"
+    when: ansible_facts['os_family'] == "RedHat"
+
+  - name: Installing RHEL packages by dnf
+    ansible.builtin.dnf:
+      name: "{{ item }}"
+      # update_cache: yes
+      enablerepo: ["powertools"]
+    loop: "{{ packages_rhel }}"
     when: ansible_facts['os_family'] == "RedHat"
 
   - name: Configuring ntp daemon
@@ -49,6 +82,7 @@
       enabled: yes
       masked: no
       state: started
+    when: ansible_facts['os_family'] in ["Debian", "Astra Linux"]
 
   - name: Configuring zabbix-agent daemon
     ansible.builtin.systemd:
