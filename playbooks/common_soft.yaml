@@ -20,10 +20,12 @@
       - dnsutils
       - ntp
       - sshfs
+      - procps
     packages_rhel:
       - bind-utils
       - chrony
       - fuse-sshfs
+      - procps-ng
 
 
   tasks:
