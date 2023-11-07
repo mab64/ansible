@@ -12,12 +12,13 @@
     zabbix_service: zabbix-agent
     zabbix_server: "127.0.0.1"
     zabbix_tlsaccept: unencrypted,psk
+    zabbix_tlsconnect: unencrypted
     zabbix_tlspskidentity: PSK001
     zabbix_tlspskfile_src: "./files/.zabbix_psk001"
     zabbix_tlspskfile_dst: /etc/zabbix/psk001
     pskfile: "{{ lookup('first_found', zabbix_tlspskfile_src, errors='ignore') }}"
-  # vars_files:  # Reassign vars
-  #   - [ ".zabbix.vars", ]
+  vars_files:  # Reassign vars
+    - [ ".zabbix.vars", ]
 
   # roles:
   #   - role: zabbix
@@ -45,7 +46,7 @@
         immediate: true
         state: enabled
         # offline: no
-      when: ansible_facts['os_family'] == "RedHat" and 
+      when: ansible_facts['os_family'] == "RedHat" and
             services_state['ansible_facts']['services']['firewalld.service']['state'] == "running"
 
     - name: Installing Zabbix repo key
@@ -82,21 +83,31 @@
         # backup: yes
       notify: Restarting Zabbix agent
 
-    - name: Copying PSK file
-      ansible.builtin.copy:
-        src: "{{ zabbix_tlspskfile_src }}"
-        dest: "{{ zabbix_tlspskfile_dst }}"
-        group: "{{ zabbix_owner }}"
-        mode: 0640
-      # when: pskfile.stat.exists
-      when: pskfile is file
-
     # - name: Checking if PSK file exists
     #   ansible.builtin.stat:
     #     path: "{{ zabbix_tlspskfile_src }}"
     #   register: pskfile
     # - ansible.builtin.debug:
     #     var: zabbix_tlspskfile_src
+
+    # - name: Copying PSK file
+    #   ansible.builtin.copy:
+    #     src: "{{ zabbix_tlspskfile_src }}"
+    #     dest: "{{ zabbix_tlspskfile_dst }}"
+    #     group: "{{ zabbix_owner }}"
+    #     mode: 0640
+    #   # when: pskfile is file
+
+    - name: Creating PSK file
+      ansible.builtin.copy:
+        content: "{{ PSK }}"
+        dest: "{{ zabbix_tlspskfile_dst }}"
+        group: "{{ zabbix_owner }}"
+        mode: 0640
+      # when: pskfile is file
+      when: PSK
+        # - PSK | length > 0
+      notify: Restarting Zabbix agent
 
     - name: "Configuring Zabbix TLSAccept"
       ansible.builtin.lineinfile:
@@ -105,8 +116,19 @@
         line: "TLSAccept={{ zabbix_tlsaccept }}"
         insertafter: '^# *TLSAccept'
         # backup: yes
-      # when: pskfile.stat.exists
-      when: pskfile is file
+      # when: pskfile is file
+      when: PSK
+      notify: Restarting Zabbix agent
+
+    - name: "Configuring Zabbix TLSConnect"
+      ansible.builtin.lineinfile:
+        path: "{{ zabbix_agent_conf }}"
+        regexp: '^TLSConnect *='
+        line: "TLSConnect={{ zabbix_tlsconnect }}"
+        insertafter: '^# *TLSConnect'
+        # backup: yes
+      # when: pskfile is file
+      when: PSK
       notify: Restarting Zabbix agent
 
     - name: "Configuring Zabbix TLSPSKIdentity"
@@ -116,8 +138,7 @@
         line: "TLSPSKIdentity={{ zabbix_tlspskidentity }}"
         insertafter: '^# *TLSPSKIdentity'
         # backup: yes
-      # when: pskfile.stat.exists
-      when: pskfile is file
+      when: PSK
       notify: Restarting Zabbix agent
 
     - name: "Configuring Zabbix TLSPSKFile"
@@ -127,8 +148,7 @@
         line: "TLSPSKFile={{ zabbix_tlspskfile_dst }}"
         insertafter: '^# *TLSPSKFile'
         # backup: yes
-      # when: pskfile.stat.exists
-      when: pskfile is file
+      when: PSK
       notify: Restarting Zabbix agent
 
   handlers:
