@@ -16,17 +16,20 @@
     zabbix_tlspskidentity: PSK001
     zabbix_tlspskfile_src: "./files/.zabbix_psk001"
     zabbix_tlspskfile_dst: /etc/zabbix/psk001
-    pskfile: "{{ lookup('first_found', zabbix_tlspskfile_src, errors='ignore') }}"
-  vars_files:  # Reassign vars
-    - [ ".zabbix.vars", ]
+    # pskfile: "{{ lookup('first_found', zabbix_tlspskfile_src, errors='ignore') }}"
+  # vars_files:  # Reassign vars
+  #   - .zabbix.vars
 
   # roles:
   #   - role: zabbix
 
   tasks:
-    - name: Loading variables from file if exists
-      include_vars: "{{ optional_vars_file }}"
-      when: optional_vars_file is file
+    - name: ...
+      ansible.builtin.debug:
+        var: optional_vars_file
+    # - name: Loading variables from file if exists
+    #   include_vars: "{{ optional_vars_file }}"
+    #   when: optional_vars_file is file
 
     - name: Printing OS Family
       ansible.builtin.debug:

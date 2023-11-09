@@ -29,66 +29,66 @@
 
 
   tasks:
-  - name: Printing OS Family
-    ansible.builtin.debug:
-      # var: ansible_facts['distribution']
-      var: ansible_facts['os_family']
+    - name: Printing OS Family
+      ansible.builtin.debug:
+        # var: ansible_facts['distribution']
+        var: ansible_facts['os_family']
 
-  - name: Installing packages by apt
-    apt:
-      name: "{{ item }}"
-      update_cache: yes
-    loop: "{{ packages }}"
-    when: ansible_facts['os_family'] in ["Debian", "Astra Linux"]
+    - name: Installing packages by apt
+      apt:
+        name: "{{ item }}"
+        update_cache: yes
+      loop: "{{ packages }}"
+      when: ansible_facts['os_family'] in ["Debian", "Astra Linux"]
 
-  - name: Installing Debian packages by apt
-    apt:
-      name: "{{ item }}"
-      update_cache: yes
-    loop: "{{ packages_deb }}"
-    when: ansible_facts['os_family'] in ["Debian", "Astra Linux"]
+    - name: Installing Debian packages by apt
+      apt:
+        name: "{{ item }}"
+        update_cache: yes
+      loop: "{{ packages_deb }}"
+      when: ansible_facts['os_family'] in ["Debian", "Astra Linux"]
 
-  - name: Installing Epel repository
-    ansible.builtin.dnf:
-      name:
-        - epel-release
-      state: present
-    when: ansible_facts['os_family'] == "RedHat"
+    - name: Installing Epel repository
+      ansible.builtin.dnf:
+        name:
+          - epel-release
+        state: present
+      when: ansible_facts['os_family'] == "RedHat"
 
-  # - name: Enabling powertools repository
-  #   ansible.builtin.dnf:
-  #     name:
-  #       - powertools
-  #     state: present
-  #   when: ansible_facts['os_family'] == "RedHat"
+    # - name: Enabling powertools repository
+    #   ansible.builtin.dnf:
+    #     name:
+    #       - powertools
+    #     state: present
+    #   when: ansible_facts['os_family'] == "RedHat"
 
-  - name: Installing packages by dnf
-    ansible.builtin.dnf:
-      name: "{{ item }}"
-      # update_cache: yes
-      enablerepo: ["powertools"]
-    loop: "{{ packages }}"
-    when: ansible_facts['os_family'] == "RedHat"
+    - name: Installing packages by dnf
+      ansible.builtin.dnf:
+        name: "{{ item }}"
+        # update_cache: yes
+        enablerepo: ["powertools"]
+      loop: "{{ packages }}"
+      when: ansible_facts['os_family'] == "RedHat"
 
-  - name: Installing RHEL packages by dnf
-    ansible.builtin.dnf:
-      name: "{{ item }}"
-      # update_cache: yes
-      enablerepo: ["powertools"]
-    loop: "{{ packages_rhel }}"
-    when: ansible_facts['os_family'] == "RedHat"
+    - name: Installing RHEL packages by dnf
+      ansible.builtin.dnf:
+        name: "{{ item }}"
+        # update_cache: yes
+        enablerepo: ["powertools"]
+      loop: "{{ packages_rhel }}"
+      when: ansible_facts['os_family'] == "RedHat"
 
-  - name: Configuring ntp daemon
-    ansible.builtin.systemd:
-      name: ntp
-      enabled: yes
-      masked: no
-      state: started
-    when: ansible_facts['os_family'] in ["Debian", "Astra Linux"]
+    - name: Configuring ntp daemon
+      ansible.builtin.systemd:
+        name: ntp
+        enabled: yes
+        masked: no
+        state: started
+      when: ansible_facts['os_family'] in ["Debian", "Astra Linux"]
 
-  - name: Configuring zabbix-agent daemon
-    ansible.builtin.systemd:
-      name: zabbix-agent
-      enabled: yes
-      masked: no
-      state: started
+    - name: Configuring zabbix-agent daemon
+      ansible.builtin.systemd:
+        name: zabbix-agent
+        enabled: yes
+        masked: no
+        state: started
