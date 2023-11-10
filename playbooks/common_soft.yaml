@@ -2,6 +2,7 @@
 - name: Install software
   gather_facts: true
   hosts: all
+  become: true
   vars:
     packages:
       # - nfs-common
@@ -89,9 +90,3 @@
         state: started
       when: ansible_facts['os_family'] in ["Debian", "Astra Linux"]
 
-    - name: Configuring zabbix-agent daemon
-      ansible.builtin.systemd:
-        name: zabbix-agent
-        enabled: yes
-        masked: no
-        state: started

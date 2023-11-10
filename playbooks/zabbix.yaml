@@ -2,6 +2,7 @@
 - name: Zabbix Agent play
   hosts: all # mon_srv  # zabbix_agents
   gather_facts: true
+  become: true
   vars:
     # optional_vars_file: "{{ lookup('first_found', '.zabbix.vars', errors='ignore') }}"
     zabbix_repo_key: "https://repo.zabbix.com/zabbix-official-repo.key"
