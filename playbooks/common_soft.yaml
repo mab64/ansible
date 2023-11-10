@@ -6,6 +6,7 @@
     packages:
       # - nfs-common
       # - postgresql-client
+      - less
       - curl
       - wget
       - tcpdump
@@ -17,11 +18,13 @@
       # - nmap  # absent in Astra Linux
       - moreutils
     packages_deb:
+      - iputils-ping
       - dnsutils
       - ntp
       - sshfs
       - procps
     packages_rhel:
+      - iputils
       - bind-utils
       - chrony
       - fuse-sshfs
