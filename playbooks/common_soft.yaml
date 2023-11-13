@@ -6,13 +6,14 @@
     packages:
       # - nfs-common
       # - postgresql-client
-      - less
+      - ca-certificates
       - curl
-      - wget
-      - tcpdump
-      - rsync
-      - tree
+      - less
       - net-tools
+      - rsync
+      - tcpdump
+      - tree
+      - wget
       # - zabbix-agent
       # - dialog  # not needed for a while
       # - nmap  # absent in Astra Linux
