@@ -3,7 +3,7 @@
   hosts: all 
   gather_facts: true
   become: true
-  vars:
+  # vars:
 
   tasks:
     - name: Printing OS Family
@@ -11,13 +11,22 @@
         # var: ansible_facts['distribution']
         var: ansible_facts['os_family']
 
+
     - name: Uninstalling old versions (RHEL)
       ansible.builtin.dnf:
-        name: 
-        state: present
+        name: "{{ item }}"
+        state: absent
+      loop:
+        - docker
+        - docker-client
+        - docker-client-latest
+        - docker-common
+        - docker-latest
+        - docker-latest-logrotate
+        - docker-logrotate
+        - docker-engine
       when: ansible_facts['os_family'] == "RedHat"
 
-    # Debian
     - name: Uninstalling old versions (Debian)
       ansible.builtin.apt:
         name: "{{ item }}"
@@ -25,9 +34,30 @@
       loop:
         - docker.io
         - docker-compose
+        - docker-compose-v2
         - docker-doc
         - podman-docker
       when: ansible_facts['os_family'] in ["Debian" ]
+
+    - name: Installing requied packages (RHEL)
+      ansible.builtin.dnf:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - gnupg2
+      when: ansible_facts['os_family'] == "RedHat"
+
+    - name: Installing requied packages (Debian)
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - ca-certificates
+        - curl
+        - gnupg
+      when: ansible_facts['os_family'] in ["Debian" ]
+
+    # - name: Add Docker's official GPG key
 
     - name: Installing Docker (Debian)
       ansible.builtin.apt:
@@ -41,4 +71,4 @@
         - docker-compose-plugin
       when: ansible_facts['os_family'] in ["Debian" ]
 
-   
+         
