@@ -3,84 +3,113 @@
   hosts: all
   gather_facts: true
   become: true
-  # vars:
+  vars:
+    - key_path: "/etc/apt/keyrings"
+    - key_file: "{{ key_path }}/docker.gpg"
+    - distribution: "Debian"
 
   tasks:
     - name: Printing OS Family
       ansible.builtin.debug:
         # var: ansible_facts['distribution']
-        var: ansible_facts['os_family']
-
-
-    - name: Uninstalling old versions (RHEL)
-      ansible.builtin.dnf:
-        name: "{{ item }}"
-        state: absent
+        var: "{{ item }}"
       loop:
-        - docker
-        - docker-client
-        - docker-client-latest
-        - docker-common
-        - docker-latest
-        - docker-latest-logrotate
-        - docker-logrotate
-        - docker-engine
-      when: ansible_facts['os_family'] == "RedHat"
+        - ansible_facts['os_family']
+        - ansible_facts['distribution']
+#        - ansible_facts['distribution_file_parsed']
+#        - ansible_facts['distribution_file_path']
+#        - ansible_facts['distribution_file_variety']
+#        - ansible_facts['distribution_major_version']
+#        - ansible_facts['distribution_release']
+#        - ansible_facts['distribution_version']
 
-    - name: Uninstalling old versions (Debian)
-      ansible.builtin.apt:
-        name: "{{ item }}"
-        state: absent
-      loop:
-        - docker.io
-        - docker-compose
-        - docker-compose-v2
-        - docker-doc
-        - podman-docker
-      when: ansible_facts['os_family'] in ["Debian" ]
+#    - pause:
+#        prompt: "Dstribution?"
+#      register: distrib
+#    - ansible.builtin.debug:
+#        var: distrib.user_input | lower
 
-    - name: Installing requied packages (RHEL)
-      ansible.builtin.dnf:
-        name: "{{ item }}"
-        state: present
-      loop:
-        - gnupg2
-      when: ansible_facts['os_family'] == "RedHat"
+#    - name: Uninstalling old versions (RHEL)
+#      ansible.builtin.dnf:
+#        name: "{{ item }}"
+#        state: absent
+#      loop:
+#        - docker
+#        - docker-client
+#        - docker-client-latest
+#        - docker-common
+#        - docker-latest
+#        - docker-latest-logrotate
+#        - docker-logrotate
+#        - docker-engine
+#      when: ansible_facts['os_family'] == "RedHat"
+#
+#    - name: Uninstalling old versions (Debian)
+#      ansible.builtin.apt:
+#        name: "{{ item }}"
+#        state: absent
+#      loop:
+#        - docker.io
+#        - docker-compose
+#        - docker-compose-v2
+#        - docker-doc
+#        - podman-docker
+#        - containerd
+#        - runc
+#      when: ansible_facts['os_family'] in ["Debian" ]
+#
+#    - name: Installing requied packages (RHEL)
+#      ansible.builtin.dnf:
+#        name: "{{ item }}"
+#        state: present
+#      loop:
+#        - gnupg2
+#      when: ansible_facts['os_family'] == "RedHat"
+#
+#    - name: Installing requied packages (Debian)
+#      ansible.builtin.apt:
+#        name: "{{ item }}"
+#        state: present
+#        update_cache: true
+#      loop:
+#        - ca-certificates
+#        - curl
+#        - gnupg
+#      when: ansible_facts['os_family'] in ["Debian" ]
 
-    - name: Installing requied packages (Debian)
-      ansible.builtin.apt:
-        name: "{{ item }}"
-        state: present
-        update_cache: true
-      loop:
-        - ca-certificates
-        - curl
-        - gnupg
-      when: ansible_facts['os_family'] in ["Debian" ]
+    - name: Checking GPG key
+      ansible.builtin.stat:
+        path: "{{ key_file }}"
+      register: key_file_stat
+
+    - ansible.builtin.debug:
+        msg: curl -fsSL https://download.docker.com/linux/{{ ansible_facts['distribution']|lower }}/gpg | sudo gpg --dearmor -o {{ key_file }}
 
     - name: Add Docker's official GPG key
       ansible.builtin.shell: |
-        install -m 0755 -d /etc/apt/keyrings
-        curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        install -m 0755 -d {{ key_path }}
+        curl -fsSL https://download.docker.com/linux/{{ ansible_facts['distribution']|lower }}/gpg | sudo gpg --dearmor -o {{ key_file }}
         chmod a+r /etc/apt/keyrings/docker.gpg
+      when: not key_file_stat.stat.exists 
 
-    - name: Add the repository to Apt sources
-      ansible.builtin.shell: |
-        echo \
-          "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
-          "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
-          tee /etc/apt/sources.list.d/docker.list > /dev/null
+#    - name: Add the repository to Apt sources
+#      ansible.builtin.shell: |
+#        echo \
+#          "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] \
+#          https://download.docker.com/linux/debian \
+#          "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+#          tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-    - name: Installing Docker (Debian)
-      ansible.builtin.apt:
-        name: "{{ item }}"
-        state: present
-        update_cache: true
-      loop:
-        - docker-ce
-        - docker-ce-cli
-        - containerd.io
-        - docker-buildx-plugin
-        - docker-compose-plugin
-      when: ansible_facts['os_family'] in ["Debian" ]
+#    - name: Installing Docker (Debian)
+#      ansible.builtin.apt:
+#        name: "{{ item }}"
+#        state: present
+#        update_cache: true
+#      loop:
+#        - docker-ce
+#        - docker-ce-cli
+#        - containerd.io
+#        - docker-buildx-plugin
+#        - docker-compose-plugin
+#      when: ansible_facts['os_family'] in ["Debian" ]
 
