@@ -84,11 +84,9 @@
         path: "{{ key_file_name }}"
       register: key_file
 
-    - ansible.builtin.debug:
-        msg: curl -fsSL https://download.docker.com/linux/{{ ansible_facts['distribution']|lower }}/gpg | sudo gpg --dearmor -o {{ key_file_name }}
-
     - name: Add Docker's official GPG key
       ansible.builtin.shell: |
+        set -o pipefail
         install -m 0755 -d {{ key_path }}
         curl -fsSL https://download.docker.com/linux/{{ ansible_facts['distribution']|lower }}/gpg | sudo gpg --dearmor -o {{ key_file_name }}
         chmod a+r {{ key_file_name }}
@@ -98,30 +96,26 @@
       ansible.builtin.stat:
         path: "{{ repo_file_name }}"
       register: repo_file
-    - ansible.builtin.debug:
-        var: repo_file_name
-    - ansible.builtin.debug:
-        var: repo_file.stat.exists
 
     - name: Add the repository to Apt sources
       ansible.builtin.shell: |
+        set -o pipefail
         echo \
           "deb [arch="$(dpkg --print-architecture)" signed-by={{ key_file_name }}] \
           https://download.docker.com/linux/{{ ansible_facts['distribution']|lower }} \
           "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
           tee {{ repo_file_name }} > /dev/null
-      when: repo_file.stat.exists == false
+      when: not repo_file.stat.exists
 
-#    - name: Installing Docker (Debian)
-#      ansible.builtin.apt:
-#        name: "{{ item }}"
-#        state: present
-#        update_cache: true
-#      loop:
-#        - docker-ce
-#        - docker-ce-cli
-#        - containerd.io
-#        - docker-buildx-plugin
-#        - docker-compose-plugin
-#      when: ansible_facts['os_family'] in ["Debian" ]
-
+    - name: Installing Docker (Debian)
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: true
+      loop:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+        - docker-buildx-plugin
+        - docker-compose-plugin
+      when: ansible_facts['os_family'] in ["Debian" ]
