@@ -5,7 +5,9 @@
   become: true
   vars:
     - key_path: "/etc/apt/keyrings"
-    - key_file: "{{ key_path }}/docker.gpg"
+    - key_file_name: "{{ key_path }}/docker.gpg"
+    - source_path: "/etc/apt/sources.list.d"
+    - repo_file_name: "{{ source_path }}/docker.list"
     - distribution: "Debian"
 
   tasks:
@@ -77,28 +79,38 @@
 #        - gnupg
 #      when: ansible_facts['os_family'] in ["Debian" ]
 
-    - name: Checking GPG key
+    - name: Checking GPG key exists
       ansible.builtin.stat:
-        path: "{{ key_file }}"
-      register: key_file_stat
+        path: "{{ key_file_name }}"
+      register: key_file
 
     - ansible.builtin.debug:
-        msg: curl -fsSL https://download.docker.com/linux/{{ ansible_facts['distribution']|lower }}/gpg | sudo gpg --dearmor -o {{ key_file }}
+        msg: curl -fsSL https://download.docker.com/linux/{{ ansible_facts['distribution']|lower }}/gpg | sudo gpg --dearmor -o {{ key_file_name }}
 
     - name: Add Docker's official GPG key
       ansible.builtin.shell: |
         install -m 0755 -d {{ key_path }}
-        curl -fsSL https://download.docker.com/linux/{{ ansible_facts['distribution']|lower }}/gpg | sudo gpg --dearmor -o {{ key_file }}
-        chmod a+r /etc/apt/keyrings/docker.gpg
-      when: not key_file_stat.stat.exists 
+        curl -fsSL https://download.docker.com/linux/{{ ansible_facts['distribution']|lower }}/gpg | sudo gpg --dearmor -o {{ key_file_name }}
+        chmod a+r {{ key_file_name }}
+      when: not key_file.stat.exists
 
-#    - name: Add the repository to Apt sources
-#      ansible.builtin.shell: |
-#        echo \
-#          "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] \
-#          https://download.docker.com/linux/debian \
-#          "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
-#          tee /etc/apt/sources.list.d/docker.list > /dev/null
+    - name: Checking repo source file exists
+      ansible.builtin.stat:
+        path: "{{ repo_file_name }}"
+      register: repo_file
+    - ansible.builtin.debug:
+        var: repo_file_name
+    - ansible.builtin.debug:
+        var: repo_file.stat.exists
+
+    - name: Add the repository to Apt sources
+      ansible.builtin.shell: |
+        echo \
+          "deb [arch="$(dpkg --print-architecture)" signed-by={{ key_file_name }}] \
+          https://download.docker.com/linux/{{ ansible_facts['distribution']|lower }} \
+          "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+          tee {{ repo_file_name }} > /dev/null
+      when: repo_file.stat.exists == false
 
 #    - name: Installing Docker (Debian)
 #      ansible.builtin.apt:
