@@ -14,6 +14,7 @@
       - net-tools
       - rsync
       - tcpdump
+      - tmux
       - tree
       - wget
       # - zabbix-agent
@@ -21,12 +22,14 @@
       # - nmap  # absent in Astra Linux
       - moreutils
     packages_deb:
+      - bat  # alternative for cat
       - gnupg
       - iputils-ping
       - dnsutils
-      - ntp
+      # - ntp
       - sshfs
       - procps
+      - vim
     packages_rhel:
       - iputils
       - bind-utils
@@ -85,11 +88,10 @@
       loop: "{{ packages_rhel }}"
       when: ansible_facts['os_family'] == "RedHat"
 
-    - name: Configuring ntp daemon
-      ansible.builtin.systemd:
-        name: ntp
-        enabled: yes
-        masked: no
-        state: started
-      when: ansible_facts['os_family'] in ["Debian", "Astra Linux"]
-
+    # - name: Configuring ntp daemon
+    #   ansible.builtin.systemd:
+    #     name: ntp
+    #     enabled: yes
+    #     masked: no
+    #     state: started
+    #   when: ansible_facts['os_family'] in ["Debian", "Astra Linux"]
